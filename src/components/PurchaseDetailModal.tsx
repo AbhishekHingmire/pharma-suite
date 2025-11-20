@@ -191,7 +191,7 @@ export function PurchaseDetailModal({ purchase, open, onOpenChange }: PurchaseDe
           )}
 
           {/* Inventory Photos */}
-          {purchase.inventoryPhotos.length > 0 && (
+          {purchase.inventoryPhotos && purchase.inventoryPhotos.length > 0 && (
             <>
               <Separator />
               <div className="space-y-3">
