@@ -13,13 +13,13 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30 overflow-x-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
-      <div className="lg:pl-60 pb-16 lg:pb-0">
+      <div className="lg:pl-60 pb-20 lg:pb-0">
         <TopBar onMenuClick={() => setSidebarOpen(true)} title={title} />
         
-        <main className="p-3 lg:p-6">
+        <main className="p-3 lg:p-6 max-w-full">
           <Breadcrumbs />
           {children}
         </main>
