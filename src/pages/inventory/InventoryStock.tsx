@@ -207,19 +207,19 @@ export default function InventoryStock() {
                     </Badge>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-3 gap-2 text-sm">
                   <div>
-                    <p className="text-muted-foreground">Batches</p>
-                    <p className="font-medium">{item.batches}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">Batches</p>
+                    <p className="font-medium text-sm">{item.batches}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Value</p>
-                    <p className="font-medium">₹{item.stockValue.toLocaleString('en-IN')}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">Value</p>
+                    <p className="font-medium text-sm truncate">₹{item.stockValue.toLocaleString('en-IN')}</p>
                   </div>
-                  <div className="col-span-2">
-                    <p className="text-muted-foreground">Oldest Expiry</p>
-                    <p className="font-medium">
-                      {item.oldestExpiry ? new Date(item.oldestExpiry).toLocaleDateString() : '-'}
+                  <div>
+                    <p className="text-[10px] text-muted-foreground truncate">Oldest Expiry</p>
+                    <p className="font-medium text-sm truncate">
+                      {item.oldestExpiry ? new Date(item.oldestExpiry).toLocaleDateString('en-IN', { month: '2-digit', day: '2-digit', year: 'numeric' }) : '-'}
                     </p>
                   </div>
                 </div>
