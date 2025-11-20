@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { getFromStorage, formatAmount, formatCompactAmount } from '@/lib/storage';
 import { Sale, Purchase, InventoryBatch, Product } from '@/types';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const sales = getFromStorage<Sale>('sales');
   const purchases = getFromStorage<Purchase>('purchases');
   const inventory = getFromStorage<InventoryBatch>('inventory');
@@ -187,21 +189,25 @@ export default function Dashboard() {
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
           <div className="grid grid-cols-3 gap-2 md:gap-3">
-            <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/purchase/new')}>
-              <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
-              <span className="hidden sm:inline ml-1.5">New Purchase</span>
-              <span className="sm:hidden ml-1">Purchase</span>
-            </Button>
+            {user?.role === 'admin' && (
+              <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/purchase/new')}>
+                <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+                <span className="hidden sm:inline ml-1.5">New Purchase</span>
+                <span className="sm:hidden ml-1">Purchase</span>
+              </Button>
+            )}
             <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/sales/new')}>
               <Receipt className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
               <span className="hidden sm:inline ml-1.5">New Sale</span>
               <span className="sm:hidden ml-1">Sale</span>
             </Button>
-            <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/payments/receive')}>
-              <Receipt className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
-              <span className="hidden sm:inline ml-1.5">Receive Payment</span>
-              <span className="sm:hidden ml-1">Payment</span>
-            </Button>
+            {user?.role === 'admin' && (
+              <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/payments/receive')}>
+                <Receipt className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+                <span className="hidden sm:inline ml-1.5">Receive Payment</span>
+                <span className="sm:hidden ml-1">Payment</span>
+              </Button>
+            )}
           </div>
         </div>
 
