@@ -186,18 +186,18 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Button className="w-full justify-start" size="lg" onClick={() => navigate('/purchase/new')}>
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              New Purchase
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 md:gap-3">
+            <Button className="w-full h-auto py-3 px-2 sm:px-4 flex-col sm:flex-row sm:justify-start gap-1 sm:gap-2" size="lg" onClick={() => navigate('/purchase/new')}>
+              <ShoppingCart className="w-5 h-5 sm:mr-0" />
+              <span className="text-xs sm:text-sm">New Purchase</span>
             </Button>
-            <Button className="w-full justify-start" size="lg" onClick={() => navigate('/sales/new')}>
-              <Receipt className="w-5 h-5 mr-2" />
-              New Sale
+            <Button className="w-full h-auto py-3 px-2 sm:px-4 flex-col sm:flex-row sm:justify-start gap-1 sm:gap-2" size="lg" onClick={() => navigate('/sales/new')}>
+              <Receipt className="w-5 h-5 sm:mr-0" />
+              <span className="text-xs sm:text-sm">New Sale</span>
             </Button>
-            <Button className="w-full justify-start" size="lg" onClick={() => navigate('/payments/receive')}>
-              <Receipt className="w-5 h-5 mr-2" />
-              Receive Payment
+            <Button className="w-full h-auto py-3 px-2 sm:px-4 flex-col sm:flex-row sm:justify-start gap-1 sm:gap-2" size="lg" onClick={() => navigate('/payments/receive')}>
+              <Receipt className="w-5 h-5 sm:mr-0" />
+              <span className="text-xs sm:text-sm">Receive Payment</span>
             </Button>
           </div>
         </div>
