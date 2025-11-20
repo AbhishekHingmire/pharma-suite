@@ -128,41 +128,60 @@ export default function Dashboard() {
         </div>
 
         {/* Alerts */}
-        <div className="space-y-3">
-          {expiringProducts.length > 0 && (
-            <Card className="p-4 border-l-4 border-l-danger">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-danger mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-danger">Products Expiring Soon</p>
-                    <p className="text-sm text-muted-foreground truncate" title={formatAmount(expiringValue)}>
-                      {expiringProducts.length} products expiring in 90 days - {formatCompactAmount(expiringValue)} value
-                    </p>
+        {(expiringProducts.length > 0 || lowStockProducts.length > 0) && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Alerts</h3>
+            <div className="space-y-3">
+              {expiringProducts.length > 0 && (
+                <Card className="p-3 md:p-4 border-l-4 border-l-danger">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                      <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-danger mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-danger text-sm md:text-base">Products Expiring Soon</p>
+                        <p className="text-xs md:text-sm text-muted-foreground truncate" title={formatAmount(expiringValue)}>
+                          {expiringProducts.length} products expiring in 90 days - {formatCompactAmount(expiringValue)} value
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="link" 
+                      size="sm" 
+                      className="w-full sm:w-auto flex-shrink-0 text-xs md:text-sm h-auto py-1" 
+                      onClick={() => navigate('/inventory/stock')}
+                    >
+                      View Details
+                    </Button>
                   </div>
-                </div>
-                <Button variant="link" size="sm" onClick={() => navigate('/inventory/stock')}>View Details</Button>
-              </div>
-            </Card>
-          )}
+                </Card>
+              )}
 
-          {lowStockProducts.length > 0 && (
-            <Card className="p-4 border-l-4 border-l-warning">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <Package className="w-5 h-5 text-warning mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-warning">Low Stock Alert</p>
-                    <p className="text-sm text-muted-foreground">
-                      {lowStockProducts.length} products below minimum stock level
-                    </p>
+              {lowStockProducts.length > 0 && (
+                <Card className="p-3 md:p-4 border-l-4 border-l-warning">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                      <Package className="w-4 h-4 md:w-5 md:h-5 text-warning mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-warning text-sm md:text-base">Low Stock Alert</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">
+                          {lowStockProducts.length} products below minimum stock level
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="link" 
+                      size="sm" 
+                      className="w-full sm:w-auto flex-shrink-0 text-xs md:text-sm h-auto py-1" 
+                      onClick={() => navigate('/inventory/stock')}
+                    >
+                      View Details
+                    </Button>
                   </div>
-                </div>
-                <Button variant="link" size="sm" onClick={() => navigate('/inventory/stock')}>View Details</Button>
-              </div>
-            </Card>
-          )}
-        </div>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div>
