@@ -8,6 +8,7 @@ import { Plus, Search, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getFromStorage } from '@/lib/storage';
 import { Sale, Customer } from '@/types';
+import { SaleDetailModal } from '@/components/SaleDetailModal';
 
 export default function SalesList() {
   const navigate = useNavigate();
