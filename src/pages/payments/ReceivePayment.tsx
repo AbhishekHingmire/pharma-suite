@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { getFromStorage, saveToStorage, getNextId } from '@/lib/storage';
 import { Customer, Sale } from '@/types';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function ReceivePayment() {
   const navigate = useNavigate();
@@ -86,6 +86,11 @@ export default function ReceivePayment() {
 
   return (
     <DashboardLayout title="Receive Payment">
+      <div className="flex justify-end mb-4">
+        <Link to="/payments/history">
+          <Button variant="outline">View Payment History</Button>
+        </Link>
+      </div>
       <Card className="max-w-2xl mx-auto p-6">
         <h2 className="text-xl font-semibold mb-6">Record Payment</h2>
 

@@ -11,6 +11,8 @@ import { Purchase, Company } from '@/types';
 export default function PurchaseList() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const purchases = getFromStorage<Purchase>('purchases');
   const companies = getFromStorage<Company>('companies');
@@ -140,6 +142,7 @@ export default function PurchaseList() {
           </div>
         )}
       </div>
+      <PurchaseDetailModal purchase={selectedPurchase} open={isModalOpen} onOpenChange={setIsModalOpen} />
     </DashboardLayout>
   );
 }
