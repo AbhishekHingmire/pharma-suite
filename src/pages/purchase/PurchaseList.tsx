@@ -7,6 +7,7 @@ import { Plus, Search, Eye, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getFromStorage } from '@/lib/storage';
 import { Purchase, Company } from '@/types';
+import { PurchaseDetailModal } from '@/components/PurchaseDetailModal';
 
 export default function PurchaseList() {
   const navigate = useNavigate();
