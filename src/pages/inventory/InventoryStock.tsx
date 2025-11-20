@@ -116,6 +116,34 @@ export default function InventoryStock() {
           </div>
         </div>
 
+        {/* Summary Cards */}
+        <div className="grid grid-cols-3 gap-2 md:gap-4">
+          <Card className="p-2 md:p-3">
+            <h3 className="text-[10px] md:text-xs font-semibold mb-1 truncate">Total Batches</h3>
+            <p className="text-base md:text-xl font-bold">{inventory.length}</p>
+          </Card>
+          <Card className="p-2 md:p-3">
+            <h3 className="text-[10px] md:text-xs font-semibold mb-1 truncate">Total Value</h3>
+            <p className="text-base md:text-xl font-bold truncate">
+              ₹{inventory.reduce((sum, inv) => sum + (inv.qty * inv.rate), 0).toLocaleString('en-IN')}
+            </p>
+          </Card>
+          <Card className="p-2 md:p-3">
+            <h3 className="text-[10px] md:text-xs font-semibold mb-1 truncate">Oldest Expiry</h3>
+            <p className="text-xs md:text-sm text-danger truncate">
+              {inventory.length > 0 && (() => {
+                const sortedByExpiry = [...inventory].sort((a, b) => 
+                  new Date(a.expiry).getTime() - new Date(b.expiry).getTime()
+                );
+                return new Date(sortedByExpiry[0].expiry).toLocaleDateString('en-IN', { 
+                  month: 'short', 
+                  year: 'numeric' 
+                });
+              })()}
+            </p>
+          </Card>
+        </div>
+
         <div className="space-y-3">
           {/* Desktop Table */}
           <div className="hidden lg:block">
