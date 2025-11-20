@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, Calendar } from 'lucide-react';
+import { DollarSign, Calendar, Share2, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getFromStorage } from '@/lib/storage';
 import { Sale, Customer, Payment } from '@/types';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function PendingPayments() {
   const navigate = useNavigate();
@@ -40,6 +41,40 @@ export default function PendingPayments() {
   };
 
   const sortedPayments = [...payments].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const handleShareWhatsApp = (type: 'pending' | 'payment', data: Sale | Payment) => {
+    let message = '';
+    if (type === 'pending') {
+      const sale = data as Sale;
+      message = `*Payment Reminder*\n\nInvoice: ${sale.invoiceNo}\nCustomer: ${getCustomerName(sale.customerId)}\nAmount: ₹${sale.total.toLocaleString('en-IN')}\nDate: ${new Date(sale.date).toLocaleDateString()}\n\nPlease clear the pending payment.`;
+    } else {
+      const payment = data as Payment;
+      message = `*Payment Receipt*\n\nDate: ${format(new Date(payment.date), 'dd MMM yyyy, hh:mm a')}\nCustomer: ${getCustomerName(payment.customerId)}\nAmount: ₹${payment.amount.toLocaleString('en-IN')}\nMode: ${payment.mode.toUpperCase()}\n${payment.reference ? `Reference: ${payment.reference}\n` : ''}Thank you for your payment!`;
+    }
+    
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    toast.success('Opening WhatsApp...');
+  };
+
+  const handleShareEmail = (type: 'pending' | 'payment', data: Sale | Payment) => {
+    let subject = '';
+    let body = '';
+    
+    if (type === 'pending') {
+      const sale = data as Sale;
+      subject = `Payment Reminder - Invoice ${sale.invoiceNo}`;
+      body = `Dear ${getCustomerName(sale.customerId)},\n\nThis is a reminder for the pending payment:\n\nInvoice: ${sale.invoiceNo}\nAmount: ₹${sale.total.toLocaleString('en-IN')}\nDate: ${new Date(sale.date).toLocaleDateString()}\n\nPlease clear the pending payment at your earliest convenience.\n\nThank you!`;
+    } else {
+      const payment = data as Payment;
+      subject = `Payment Receipt - ${format(new Date(payment.date), 'dd MMM yyyy')}`;
+      body = `Dear ${getCustomerName(payment.customerId)},\n\nThank you for your payment!\n\nPayment Receipt:\nDate: ${format(new Date(payment.date), 'dd MMM yyyy, hh:mm a')}\nAmount: ₹${payment.amount.toLocaleString('en-IN')}\nMode: ${payment.mode.toUpperCase()}\n${payment.reference ? `Reference: ${payment.reference}\n` : ''}\nThank you for your business!`;
+    }
+    
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoUrl, '_blank');
+    toast.success('Opening email client...');
+  };
 
   return (
     <DashboardLayout title="Payments">
@@ -101,9 +136,27 @@ export default function PendingPayments() {
                               </Badge>
                             </td>
                             <td className="p-4 text-center">
-                              <Button size="sm" onClick={() => navigate('/payments/receive')}>
-                                Record Payment
-                              </Button>
+                              <div className="flex items-center justify-center gap-2">
+                                <Button size="sm" onClick={() => navigate('/payments/receive')}>
+                                  Record Payment
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleShareWhatsApp('pending', sale)}
+                                  title="Share on WhatsApp"
+                                >
+                                  <Share2 className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleShareEmail('pending', sale)}
+                                  title="Share via Email"
+                                >
+                                  <Mail className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -148,9 +201,25 @@ export default function PendingPayments() {
                         </span>
                       </div>
                     </div>
-                    <Button className="w-full" size="sm" onClick={() => navigate('/payments/receive')}>
-                      Record Payment
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button className="flex-1" size="sm" onClick={() => navigate('/payments/receive')}>
+                        Record Payment
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleShareWhatsApp('pending', sale)}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleShareEmail('pending', sale)}
+                      >
+                        <Mail className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </Card>
                 );
               })}
@@ -180,6 +249,7 @@ export default function PendingPayments() {
                         <th className="text-left p-3 text-xs font-semibold uppercase">Mode</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Reference</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Notes</th>
+                        <th className="text-center p-3 text-xs font-semibold uppercase">Share</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -209,6 +279,26 @@ export default function PendingPayments() {
                           <td className="p-3 text-sm text-muted-foreground">{payment.reference || '-'}</td>
                           <td className="p-3 text-sm text-muted-foreground max-w-xs truncate">
                             {payment.notes || '-'}
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center justify-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleShareWhatsApp('payment', payment)}
+                                title="Share on WhatsApp"
+                              >
+                                <Share2 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleShareEmail('payment', payment)}
+                                title="Share via Email"
+                              >
+                                <Mail className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -244,6 +334,26 @@ export default function PendingPayments() {
                         {payment.notes}
                       </div>
                     )}
+                    <div className="flex gap-2 pt-2 border-t">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => handleShareWhatsApp('payment', payment)}
+                      >
+                        <Share2 className="w-4 h-4 mr-1" />
+                        WhatsApp
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => handleShareEmail('payment', payment)}
+                      >
+                        <Mail className="w-4 h-4 mr-1" />
+                        Email
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
