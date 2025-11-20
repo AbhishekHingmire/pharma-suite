@@ -55,10 +55,6 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         </nav>
 
         <div className="p-4 border-t border-border">
-          <div className="mb-3 px-4 py-2 bg-muted rounded-lg">
-            <p className="text-sm font-medium">{user?.name}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
-          </div>
           <button
             onClick={logout}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
