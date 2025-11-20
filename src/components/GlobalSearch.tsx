@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, Package, Users, FileText, ShoppingCart, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { getFromStorage } from '@/lib/storage';
 import { Product, Customer, Sale, Purchase } from '@/types';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,7 @@ interface SearchResult {
 
 export function GlobalSearch() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -33,6 +35,7 @@ export function GlobalSearch() {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setIsMobileExpanded(false);
       }
     }
 
@@ -126,6 +129,7 @@ export function GlobalSearch() {
   const handleResultClick = (result: SearchResult) => {
     navigate(result.path);
     setIsOpen(false);
+    setIsMobileExpanded(false);
     setQuery('');
     
     // Save to recent searches
@@ -144,86 +148,201 @@ export function GlobalSearch() {
     }
   };
 
+  const handleMobileSearchClick = () => {
+    setIsMobileExpanded(true);
+    setIsOpen(true);
+  };
+
+  const handleCloseMobileSearch = () => {
+    setIsMobileExpanded(false);
+    setIsOpen(false);
+    setQuery('');
+  };
+
   return (
-    <div ref={searchRef} className="relative">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Search products, customers, invoices..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setIsOpen(true)}
-          className={cn(
-            "pl-9 pr-9 transition-all duration-200",
-            isOpen ? "w-64 md:w-96" : "w-48"
-          )}
+    <>
+      {/* Mobile backdrop when expanded */}
+      {isMobileExpanded && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={handleCloseMobileSearch}
         />
-        {query && (
-          <button
-            onClick={() => setQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
+      )}
 
-      {isOpen && (
-        <div className="absolute top-full mt-2 w-full md:w-96 bg-card border rounded-lg shadow-lg max-h-96 overflow-auto z-50">
-          {query.length < 2 && recentSearches.length > 0 && (
-            <div className="p-2">
-              <div className="text-xs text-muted-foreground px-2 py-1">Recent Searches</div>
-              {recentSearches.map((search, idx) => (
+      <div ref={searchRef} className="relative">
+        {/* Mobile: Show only icon by default */}
+        <div className="md:hidden">
+          {!isMobileExpanded ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleMobileSearchClick}
+              className="relative"
+            >
+              <Search className="w-5 h-5" />
+            </Button>
+          ) : (
+            <div className="fixed top-3 left-3 right-3 z-50">
+              <div className="relative bg-background rounded-lg shadow-lg">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search products, customers, invoices..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="pl-9 pr-9 border-0"
+                  autoFocus
+                />
                 <button
-                  key={idx}
-                  onClick={() => setQuery(search)}
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded"
+                  onClick={handleCloseMobileSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {search}
+                  <X className="w-4 h-4" />
                 </button>
-              ))}
-            </div>
-          )}
+              </div>
 
-          {query.length >= 2 && results.length === 0 && (
-            <div className="p-8 text-center">
-              <Search className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">No results found</p>
-            </div>
-          )}
-
-          {results.length > 0 && (
-            <div className="p-2">
-              {['product', 'customer', 'sale', 'purchase'].map(type => {
-                const typeResults = results.filter(r => r.type === type);
-                if (typeResults.length === 0) return null;
-
-                return (
-                  <div key={type} className="mb-2">
-                    <div className="text-xs text-muted-foreground uppercase px-2 py-1 font-semibold">
-                      {type}s
+              {/* Mobile Results */}
+              {isOpen && (
+                <div className="mt-2 bg-card border rounded-lg shadow-lg max-h-[70vh] overflow-auto">
+                  {query.length < 2 && recentSearches.length > 0 && (
+                    <div className="p-2">
+                      <div className="text-xs text-muted-foreground px-2 py-1">Recent Searches</div>
+                      {recentSearches.map((search, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setQuery(search)}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded"
+                        >
+                          {search}
+                        </button>
+                      ))}
                     </div>
-                    {typeResults.map((result) => (
-                      <button
-                        key={`${result.type}-${result.id}`}
-                        onClick={() => handleResultClick(result)}
-                        className="w-full text-left px-3 py-2 hover:bg-muted rounded flex items-start gap-3 transition-colors"
-                      >
-                        <div className="mt-0.5">{getIcon(result.type)}</div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium truncate">{result.title}</div>
-                          <div className="text-xs text-muted-foreground truncate">{result.subtitle}</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                );
-              })}
+                  )}
+
+                  {query.length >= 2 && results.length === 0 && (
+                    <div className="p-8 text-center">
+                      <Search className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">No results found</p>
+                    </div>
+                  )}
+
+                  {results.length > 0 && (
+                    <div className="p-2">
+                      {['product', 'customer', 'sale', 'purchase'].map(type => {
+                        const typeResults = results.filter(r => r.type === type);
+                        if (typeResults.length === 0) return null;
+
+                        return (
+                          <div key={type} className="mb-2">
+                            <div className="text-xs text-muted-foreground uppercase px-2 py-1 font-semibold">
+                              {type}s
+                            </div>
+                            {typeResults.map((result) => (
+                              <button
+                                key={`${result.type}-${result.id}`}
+                                onClick={() => handleResultClick(result)}
+                                className="w-full text-left px-3 py-2 hover:bg-muted rounded flex items-start gap-3 transition-colors"
+                              >
+                                <div className="mt-0.5">{getIcon(result.type)}</div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium truncate">{result.title}</div>
+                                  <div className="text-xs text-muted-foreground truncate">{result.subtitle}</div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
-    </div>
+
+        {/* Desktop: Show full input */}
+        <div className="hidden md:block">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search products, customers, invoices..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setIsOpen(true)}
+              className={cn(
+                "pl-9 pr-9 transition-all duration-200",
+                isOpen ? "w-64 md:w-96" : "w-48"
+              )}
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {isOpen && (
+            <div className="absolute top-full mt-2 w-full md:w-96 bg-card border rounded-lg shadow-lg max-h-96 overflow-auto z-50">
+              {query.length < 2 && recentSearches.length > 0 && (
+                <div className="p-2">
+                  <div className="text-xs text-muted-foreground px-2 py-1">Recent Searches</div>
+                  {recentSearches.map((search, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setQuery(search)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded"
+                    >
+                      {search}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {query.length >= 2 && results.length === 0 && (
+                <div className="p-8 text-center">
+                  <Search className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">No results found</p>
+                </div>
+              )}
+
+              {results.length > 0 && (
+                <div className="p-2">
+                  {['product', 'customer', 'sale', 'purchase'].map(type => {
+                    const typeResults = results.filter(r => r.type === type);
+                    if (typeResults.length === 0) return null;
+
+                    return (
+                      <div key={type} className="mb-2">
+                        <div className="text-xs text-muted-foreground uppercase px-2 py-1 font-semibold">
+                          {type}s
+                        </div>
+                        {typeResults.map((result) => (
+                          <button
+                            key={`${result.type}-${result.id}`}
+                            onClick={() => handleResultClick(result)}
+                            className="w-full text-left px-3 py-2 hover:bg-muted rounded flex items-start gap-3 transition-colors"
+                          >
+                            <div className="mt-0.5">{getIcon(result.type)}</div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium truncate">{result.title}</div>
+                              <div className="text-xs text-muted-foreground truncate">{result.subtitle}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
