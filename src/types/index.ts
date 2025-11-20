@@ -70,6 +70,8 @@ export interface Purchase {
   transactionId?: string;
   paymentProof?: string[];
   inventoryPhotos: string[];
+  createdAt?: string;
+  lastEditedAt?: string;
 }
 
 export interface SalesItem {

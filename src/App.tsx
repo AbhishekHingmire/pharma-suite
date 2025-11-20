@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PurchaseList from "./pages/purchase/PurchaseList";
 import NewPurchase from "./pages/purchase/NewPurchase";
+import EditPurchase from "./pages/purchase/EditPurchase";
 import SalesList from "./pages/sales/SalesList";
 import NewSale from "./pages/sales/NewSale";
 import InventoryStock from "./pages/inventory/InventoryStock";
@@ -52,6 +53,11 @@ function AppRoutes() {
       <Route path="/purchase/new" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <NewPurchase />
+        </ProtectedRoute>
+      } />
+      <Route path="/purchase/edit/:id" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <EditPurchase />
         </ProtectedRoute>
       } />
       

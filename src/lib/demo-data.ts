@@ -61,7 +61,8 @@ export const demoPurchases: Purchase[] = [
     total: 10180.80,
     paymentStatus: 'paid',
     paidAmount: 10180.80,
-    inventoryPhotos: []
+    inventoryPhotos: [],
+    createdAt: "2025-01-05T10:30:00.000Z"
   },
   {
     id: 2,
@@ -75,7 +76,8 @@ export const demoPurchases: Purchase[] = [
     gst: 1980,
     total: 18480,
     paymentStatus: 'pending',
-    inventoryPhotos: []
+    inventoryPhotos: [],
+    createdAt: "2024-12-20T14:15:00.000Z"
   }
 ];
 
