@@ -4,8 +4,10 @@ import { TrendingUp, TrendingDown, ShoppingCart, Receipt, AlertCircle, Package }
 import { Button } from '@/components/ui/button';
 import { getFromStorage } from '@/lib/storage';
 import { Sale, Purchase, InventoryBatch, Product } from '@/types';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const sales = getFromStorage<Sale>('sales');
   const purchases = getFromStorage<Purchase>('purchases');
   const inventory = getFromStorage<InventoryBatch>('inventory');
@@ -115,7 +117,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <Button variant="link" size="sm">View Details</Button>
+                <Button variant="link" size="sm" onClick={() => navigate('/inventory/stock')}>View Details</Button>
               </div>
             </Card>
           )}
@@ -132,7 +134,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <Button variant="link" size="sm">View Details</Button>
+                <Button variant="link" size="sm" onClick={() => navigate('/inventory/stock')}>View Details</Button>
               </div>
             </Card>
           )}
@@ -142,15 +144,15 @@ export default function Dashboard() {
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Button className="w-full justify-start" size="lg">
+            <Button className="w-full justify-start" size="lg" onClick={() => navigate('/purchase/new')}>
               <ShoppingCart className="w-5 h-5 mr-2" />
               New Purchase
             </Button>
-            <Button className="w-full justify-start" size="lg">
+            <Button className="w-full justify-start" size="lg" onClick={() => navigate('/sales/new')}>
               <Receipt className="w-5 h-5 mr-2" />
               New Sale
             </Button>
-            <Button className="w-full justify-start" size="lg">
+            <Button className="w-full justify-start" size="lg" onClick={() => navigate('/payments/receive')}>
               <Receipt className="w-5 h-5 mr-2" />
               Receive Payment
             </Button>
