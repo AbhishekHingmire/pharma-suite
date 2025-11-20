@@ -203,20 +203,22 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Activities */}
-        <Card className="p-6">
+        <Card className="p-4 md:p-6">
           <h3 className="text-lg font-semibold mb-4">Recent Activities</h3>
           <div className="space-y-3">
             {sales.slice(0, 5).map((sale, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-3 py-2 border-b last:border-0">
+              <div key={idx} className="flex items-center justify-between gap-2 py-2 border-b last:border-0">
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{sale.invoiceNo}</p>
-                  <p className="text-sm text-muted-foreground">{new Date(sale.date).toLocaleDateString()}</p>
+                  <p className="font-medium truncate text-sm md:text-base">{sale.invoiceNo}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">{new Date(sale.date).toLocaleDateString()}</p>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="font-semibold truncate" title={formatAmount(sale.total)}>
-                    {formatCompactAmount(sale.total)}
-                  </p>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
+                <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+                  <div className="text-right">
+                    <p className="font-semibold truncate text-sm md:text-base" title={formatAmount(sale.total)}>
+                      {formatCompactAmount(sale.total)}
+                    </p>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
                     sale.status === 'paid' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
                   }`}>
                     {sale.status}
