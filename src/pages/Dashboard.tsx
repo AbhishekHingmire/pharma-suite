@@ -186,18 +186,21 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
-          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 md:gap-3">
-            <Button className="w-full h-auto py-3 px-2 sm:px-4 flex-col sm:flex-row sm:justify-start gap-1 sm:gap-2" size="lg" onClick={() => navigate('/purchase/new')}>
-              <ShoppingCart className="w-5 h-5 sm:mr-0" />
-              <span className="text-xs sm:text-sm">New Purchase</span>
+          <div className="grid grid-cols-3 gap-2 md:gap-3">
+            <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/purchase/new')}>
+              <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+              <span className="hidden sm:inline ml-1.5">New Purchase</span>
+              <span className="sm:hidden ml-1">Purchase</span>
             </Button>
-            <Button className="w-full h-auto py-3 px-2 sm:px-4 flex-col sm:flex-row sm:justify-start gap-1 sm:gap-2" size="lg" onClick={() => navigate('/sales/new')}>
-              <Receipt className="w-5 h-5 sm:mr-0" />
-              <span className="text-xs sm:text-sm">New Sale</span>
+            <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/sales/new')}>
+              <Receipt className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+              <span className="hidden sm:inline ml-1.5">New Sale</span>
+              <span className="sm:hidden ml-1">Sale</span>
             </Button>
-            <Button className="w-full h-auto py-3 px-2 sm:px-4 flex-col sm:flex-row sm:justify-start gap-1 sm:gap-2" size="lg" onClick={() => navigate('/payments/receive')}>
-              <Receipt className="w-5 h-5 sm:mr-0" />
-              <span className="text-xs sm:text-sm">Receive Payment</span>
+            <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/payments/receive')}>
+              <Receipt className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+              <span className="hidden sm:inline ml-1.5">Receive Payment</span>
+              <span className="sm:hidden ml-1">Payment</span>
             </Button>
           </div>
         </div>
