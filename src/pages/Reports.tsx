@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { getFromStorage } from '@/lib/storage';
+import { getFromStorage, formatAmount, formatCompactAmount } from '@/lib/storage';
 import { Sale, Purchase, Customer, Product, Company } from '@/types';
 import { FileText, Download, TrendingUp, TrendingDown, DollarSign, Package } from 'lucide-react';
 import { format } from 'date-fns';
@@ -115,55 +115,67 @@ export default function Reports() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Total Sales</p>
-                <h3 className="text-xl font-bold mt-1">₹{totalSales.toLocaleString('en-IN')}</h3>
+                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(totalSales)}>
+                  <span className="md:hidden">{formatCompactAmount(totalSales)}</span>
+                  <span className="hidden md:inline">{formatAmount(totalSales)}</span>
+                </h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   {filteredSales.length} invoices
                 </p>
               </div>
-              <div className="p-2 bg-success/10 rounded">
+              <div className="p-2 bg-success/10 rounded flex-shrink-0">
                 <TrendingUp className="w-5 h-5 text-success" />
               </div>
             </div>
           </Card>
 
           <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Total Purchases</p>
-                <h3 className="text-xl font-bold mt-1">₹{totalPurchases.toLocaleString('en-IN')}</h3>
+                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(totalPurchases)}>
+                  <span className="md:hidden">{formatCompactAmount(totalPurchases)}</span>
+                  <span className="hidden md:inline">{formatAmount(totalPurchases)}</span>
+                </h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   {filteredPurchases.length} invoices
                 </p>
               </div>
-              <div className="p-2 bg-danger/10 rounded">
+              <div className="p-2 bg-danger/10 rounded flex-shrink-0">
                 <TrendingDown className="w-5 h-5 text-danger" />
               </div>
             </div>
           </Card>
 
           <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Gross Profit</p>
-                <h3 className="text-xl font-bold mt-1">₹{grossProfit.toLocaleString('en-IN')}</h3>
+                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(grossProfit)}>
+                  <span className="md:hidden">{formatCompactAmount(grossProfit)}</span>
+                  <span className="hidden md:inline">{formatAmount(grossProfit)}</span>
+                </h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   {totalSales > 0 ? ((grossProfit / totalSales) * 100).toFixed(1) : 0}% margin
                 </p>
               </div>
-              <div className="p-2 bg-blue-500/10 rounded">
+              <div className="p-2 bg-blue-500/10 rounded flex-shrink-0">
                 <DollarSign className="w-5 h-5 text-blue-500" />
               </div>
             </div>
           </Card>
 
           <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Outstanding</p>
-                <h3 className="text-xl font-bold mt-1">₹{totalOutstanding.toLocaleString('en-IN')}</h3>
+                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(totalOutstanding)}>
+                  <span className="md:hidden">{formatCompactAmount(totalOutstanding)}</span>
+                  <span className="hidden md:inline">{formatAmount(totalOutstanding)}</span>
+                </h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   From {customers.filter(c => c.outstanding > 0).length} customers
                 </p>
@@ -200,13 +212,15 @@ export default function Reports() {
                 {topCustomers.map((customer, index) => (
                   <tr key={customer.id} className="border-b hover:bg-muted/30">
                     <td className="p-3 text-sm font-bold">#{index + 1}</td>
-                    <td className="p-3 text-sm font-medium">{customer.name}</td>
+                    <td className="p-3 text-sm font-medium truncate max-w-[200px]">{customer.name}</td>
                     <td className="p-3 text-sm">Type {customer.type}</td>
-                    <td className="p-3 text-sm font-semibold">
-                      ₹{customer.totalAmount.toLocaleString('en-IN')}
+                    <td className="p-3 text-sm font-semibold truncate max-w-[150px]" title={formatAmount(customer.totalAmount)}>
+                      {formatCompactAmount(customer.totalAmount)}
                     </td>
                     <td className="p-3 text-sm">{customer.salesCount}</td>
-                    <td className="p-3 text-sm">₹{customer.outstanding.toLocaleString('en-IN')}</td>
+                    <td className="p-3 text-sm truncate max-w-[120px]" title={formatAmount(customer.outstanding)}>
+                      {formatCompactAmount(customer.outstanding)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -238,11 +252,11 @@ export default function Reports() {
                 {topProducts.map((product, index) => (
                   <tr key={product.id} className="border-b hover:bg-muted/30">
                     <td className="p-3 text-sm font-bold">#{index + 1}</td>
-                    <td className="p-3 text-sm font-medium">{product.name}</td>
-                    <td className="p-3 text-sm">{getCompanyName(product.companyId)}</td>
+                    <td className="p-3 text-sm font-medium truncate max-w-[200px]">{product.name}</td>
+                    <td className="p-3 text-sm truncate max-w-[150px]">{getCompanyName(product.companyId)}</td>
                     <td className="p-3 text-sm">{product.totalQty} units</td>
-                    <td className="p-3 text-sm font-semibold">
-                      ₹{product.totalAmount.toLocaleString('en-IN')}
+                    <td className="p-3 text-sm font-semibold truncate max-w-[150px]" title={formatAmount(product.totalAmount)}>
+                      {formatCompactAmount(product.totalAmount)}
                     </td>
                   </tr>
                 ))}

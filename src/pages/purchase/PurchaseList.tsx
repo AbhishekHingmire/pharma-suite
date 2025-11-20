@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Plus, Search, Eye, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getFromStorage } from '@/lib/storage';
+import { getFromStorage, formatAmount, formatCompactAmount } from '@/lib/storage';
 import { Purchase, Company } from '@/types';
 import { PurchaseDetailModal } from '@/components/PurchaseDetailModal';
 
@@ -84,8 +84,9 @@ export default function PurchaseList() {
                           <td className="p-4 font-medium">{getCompanyName(purchase.companyId)}</td>
                           <td className="p-4">{purchase.invoiceNo}</td>
                           <td className="p-4 text-right">{purchase.items.length}</td>
-                          <td className="p-4 text-right font-semibold">
-                            ₹{purchase.total.toLocaleString('en-IN')}
+                          <td className="p-4 text-right font-semibold truncate max-w-[150px]" title={formatAmount(purchase.total)}>
+                            <span className="md:hidden">{formatCompactAmount(purchase.total)}</span>
+                            <span className="hidden md:inline">{formatAmount(purchase.total)}</span>
                           </td>
                           <td className="p-4">
                             <div className="flex items-center justify-center gap-2">
@@ -131,11 +132,13 @@ export default function PurchaseList() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-sm text-muted-foreground">{purchase.items.length} products</p>
-                      <p className="text-lg font-bold">₹{purchase.total.toLocaleString('en-IN')}</p>
+                      <p className="text-lg font-bold truncate" title={formatAmount(purchase.total)}>
+                        {formatCompactAmount(purchase.total)}
+                      </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0">
                       <Button 
                         variant="ghost" 
                         size="icon"
