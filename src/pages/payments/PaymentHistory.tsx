@@ -72,7 +72,7 @@ export default function PaymentHistory() {
                   <table className="w-full">
                     <thead className="border-b">
                       <tr className="bg-muted/50">
-                        <th className="text-left p-3 text-xs font-semibold uppercase w-48">Date & Time</th>
+                        <th className="text-left p-3 text-xs font-semibold uppercase min-w-[140px]">Date & Time</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Customer</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Amount</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Mode</th>
@@ -83,9 +83,9 @@ export default function PaymentHistory() {
                     <tbody>
                       {filteredPayments.map((payment) => (
                         <tr key={payment.id} className="border-b hover:bg-muted/30">
-                          <td className="p-3 text-sm w-48">
-                            <div>{format(new Date(payment.date), 'dd MMM yyyy')}</div>
-                            <div className="text-xs text-muted-foreground">
+                          <td className="p-3 text-sm min-w-[140px]">
+                            <div className="whitespace-nowrap">{format(new Date(payment.date), 'dd MMM yyyy')}</div>
+                            <div className="text-xs text-muted-foreground whitespace-nowrap">
                               {new Date(payment.date).toLocaleTimeString('en-IN', { 
                                 hour: '2-digit', 
                                 minute: '2-digit' 

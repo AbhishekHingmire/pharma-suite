@@ -107,7 +107,7 @@ export default function PendingPayments() {
                       <tr className="border-b">
                         <th className="text-left p-4 font-semibold">Customer</th>
                         <th className="text-left p-4 font-semibold">Invoice No</th>
-                        <th className="text-left p-4 font-semibold w-48">Date & Time</th>
+                        <th className="text-left p-4 font-semibold min-w-[140px]">Date & Time</th>
                         <th className="text-right p-4 font-semibold">Amount</th>
                         <th className="text-right p-4 font-semibold">Days Overdue</th>
                         <th className="text-center p-4 font-semibold">Status</th>
@@ -121,9 +121,9 @@ export default function PendingPayments() {
                           <tr key={sale.id} className="border-b last:border-0 hover:bg-muted/50">
                             <td className="p-4 font-medium">{getCustomerName(sale.customerId)}</td>
                             <td className="p-4">{sale.invoiceNo}</td>
-                            <td className="p-4 w-48">
-                              <div className="text-sm">{format(new Date(sale.date), 'dd MMM yyyy')}</div>
-                              <div className="text-xs text-muted-foreground">
+                            <td className="p-4 min-w-[140px]">
+                              <div className="text-sm whitespace-nowrap">{format(new Date(sale.date), 'dd MMM yyyy')}</div>
+                              <div className="text-xs text-muted-foreground whitespace-nowrap">
                                 {new Date(sale.date).toLocaleTimeString('en-IN', { 
                                   hour: '2-digit', 
                                   minute: '2-digit' 
@@ -259,7 +259,7 @@ export default function PendingPayments() {
                   <table className="w-full">
                     <thead className="border-b">
                       <tr className="bg-muted/50">
-                        <th className="text-left p-3 text-xs font-semibold uppercase w-48">Date & Time</th>
+                        <th className="text-left p-3 text-xs font-semibold uppercase min-w-[140px]">Date & Time</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Customer</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Amount</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Mode</th>
@@ -271,9 +271,9 @@ export default function PendingPayments() {
                     <tbody>
                       {sortedPayments.map((payment) => (
                         <tr key={payment.id} className="border-b hover:bg-muted/30">
-                          <td className="p-3 text-sm w-48">
-                            <div>{format(new Date(payment.date), 'dd MMM yyyy')}</div>
-                            <div className="text-xs text-muted-foreground">
+                          <td className="p-3 text-sm min-w-[140px]">
+                            <div className="whitespace-nowrap">{format(new Date(payment.date), 'dd MMM yyyy')}</div>
+                            <div className="text-xs text-muted-foreground whitespace-nowrap">
                               {new Date(payment.date).toLocaleTimeString('en-IN', { 
                                 hour: '2-digit', 
                                 minute: '2-digit' 
