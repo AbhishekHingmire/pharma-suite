@@ -20,6 +20,13 @@ import RateMaster from "./pages/masters/RateMaster";
 import Users from "./pages/masters/Users";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Reports from "./pages/Reports";
+import Workers from "./pages/Workers";
+import PaymentHistory from "./pages/payments/PaymentHistory";
+import Companies from "./pages/masters/Companies";
+import Products from "./pages/masters/Products";
+import Customers from "./pages/masters/Customers";
+import Schemes from "./pages/masters/Schemes";
 
 const queryClient = new QueryClient();
 
@@ -83,7 +90,19 @@ function AppRoutes() {
       
       <Route path="/reports" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <Dashboard />
+          <Reports />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/workers" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Workers />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/payments/history" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <PaymentHistory />
         </ProtectedRoute>
       } />
       
@@ -100,6 +119,26 @@ function AppRoutes() {
       <Route path="/masters/users" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <Users />
+        </ProtectedRoute>
+      } />
+      <Route path="/masters/companies" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Companies />
+        </ProtectedRoute>
+      } />
+      <Route path="/masters/products" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Products />
+        </ProtectedRoute>
+      } />
+      <Route path="/masters/customers" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Customers />
+        </ProtectedRoute>
+      } />
+      <Route path="/masters/schemes" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Schemes />
         </ProtectedRoute>
       } />
       <Route path="/masters/*" element={

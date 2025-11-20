@@ -13,6 +13,8 @@ export default function SalesList() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'paid' | 'unpaid' | 'partial'>('all');
+  const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const sales = getFromStorage<Sale>('sales');
   const customers = getFromStorage<Customer>('customers');
@@ -178,6 +180,7 @@ export default function SalesList() {
           </div>
         )}
       </div>
+      <SaleDetailModal sale={selectedSale} open={isModalOpen} onOpenChange={setIsModalOpen} />
     </DashboardLayout>
   );
 }
