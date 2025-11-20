@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -28,8 +29,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { UserCog, Plus, Edit, Trash2, Key, Copy } from 'lucide-react';
+import { UserCog, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+interface Permission {
+  module: string;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
 
 interface User {
   id: number;
@@ -38,7 +48,27 @@ interface User {
   role: 'admin' | 'staff';
   status: 'active' | 'inactive';
   lastLogin: string;
+  permissions: Permission[];
 }
+
+interface Activity {
+  id: number;
+  type: 'purchase' | 'sale' | 'payment' | 'inventory';
+  action: string;
+  timestamp: string;
+  details: string;
+}
+
+const modules = [
+  'Dashboard',
+  'Sales',
+  'Purchase',
+  'Inventory',
+  'Payments',
+  'Customers',
+  'Products',
+  'Reports'
+];
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([
@@ -48,7 +78,8 @@ export default function UsersPage() {
       mobile: '9876543210',
       role: 'admin',
       status: 'active',
-      lastLogin: '2025-01-16 10:30 AM'
+      lastLogin: '16 Jan, 10:30 AM',
+      permissions: modules.map(m => ({ module: m, canView: true, canEdit: true, canDelete: true }))
     },
     {
       id: 2,
@@ -56,33 +87,68 @@ export default function UsersPage() {
       mobile: '9876543211',
       role: 'staff',
       status: 'active',
-      lastLogin: '2025-01-16 09:15 AM'
+      lastLogin: '16 Jan, 09:15 AM',
+      permissions: modules.map(m => ({ module: m, canView: true, canEdit: m !== 'Reports', canDelete: false }))
     }
   ]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isActivityOpen, setIsActivityOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [activityFilter, setActivityFilter] = useState<'today' | 'week' | 'month'>('today');
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
     role: 'staff' as 'admin' | 'staff',
-    status: 'active' as 'active' | 'inactive'
+    status: 'active' as 'active' | 'inactive',
+    permissions: modules.map(m => ({ module: m, canView: true, canEdit: false, canDelete: false }))
   });
-  const [generatedPassword, setGeneratedPassword] = useState('');
 
-  const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
+  // Mock activity data
+  const [activities] = useState<Activity[]>([
+    {
+      id: 1,
+      type: 'sale',
+      action: 'Added New Sale',
+      timestamp: '2025-01-16 10:30 AM',
+      details: 'Invoice #INV-001 - ₹25,000'
+    },
+    {
+      id: 2,
+      type: 'payment',
+      action: 'Received Payment',
+      timestamp: '2025-01-16 09:15 AM',
+      details: 'Customer: ABC Pharmacy - ₹15,000'
+    },
+    {
+      id: 3,
+      type: 'inventory',
+      action: 'Updated Stock',
+      timestamp: '2025-01-15 04:30 PM',
+      details: 'Product: Paracetamol 500mg - Added 500 units'
+    },
+    {
+      id: 4,
+      type: 'purchase',
+      action: 'Added Purchase',
+      timestamp: '2025-01-15 02:20 PM',
+      details: 'Supplier: MediCorp - ₹50,000'
     }
-    setGeneratedPassword(password);
-    toast.success('Password generated!');
-  };
+  ]);
 
-  const copyPassword = () => {
-    navigator.clipboard.writeText(generatedPassword);
-    toast.success('Password copied to clipboard!');
+  const getFilteredActivities = () => {
+    const now = new Date();
+    return activities.filter(activity => {
+      const activityDate = new Date(activity.timestamp);
+      const diffTime = now.getTime() - activityDate.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (activityFilter === 'today') return diffDays === 0;
+      if (activityFilter === 'week') return diffDays <= 7;
+      if (activityFilter === 'month') return diffDays <= 30;
+      return true;
+    });
   };
 
   const handleAdd = () => {
@@ -91,9 +157,9 @@ export default function UsersPage() {
       name: '',
       mobile: '',
       role: 'staff',
-      status: 'active'
+      status: 'active',
+      permissions: modules.map(m => ({ module: m, canView: true, canEdit: false, canDelete: false }))
     });
-    setGeneratedPassword('');
     setIsDialogOpen(true);
   };
 
@@ -103,9 +169,9 @@ export default function UsersPage() {
       name: user.name,
       mobile: user.mobile,
       role: user.role,
-      status: user.status
+      status: user.status,
+      permissions: user.permissions
     });
-    setGeneratedPassword('');
     setIsDialogOpen(true);
   };
 
@@ -141,9 +207,28 @@ export default function UsersPage() {
     }
   };
 
-  const handleResetPassword = (user: User) => {
-    generatePassword();
-    toast.success(`Password reset for ${user.name}`);
+  const handleViewActivity = (userId: number) => {
+    setSelectedUserId(userId);
+    setIsActivityOpen(true);
+  };
+
+  const updatePermission = (moduleIndex: number, field: 'canView' | 'canEdit' | 'canDelete', value: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      permissions: prev.permissions.map((p, i) => 
+        i === moduleIndex ? { ...p, [field]: value } : p
+      )
+    }));
+  };
+
+  const getActivityIcon = (type: string) => {
+    const colors = {
+      sale: 'bg-success',
+      purchase: 'bg-primary',
+      payment: 'bg-blue-500',
+      inventory: 'bg-orange-500'
+    };
+    return colors[type as keyof typeof colors] || 'bg-gray-500';
   };
 
   const getInitials = (name: string) => {
@@ -155,18 +240,17 @@ export default function UsersPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">
-              Manage team members and their access levels
-            </p>
+            <h2 className="text-2xl font-bold">Users</h2>
+            <p className="text-muted-foreground">Manage user accounts and permissions</p>
           </div>
           <Button onClick={handleAdd}>
-            <Plus className="w-4 h-4 mr-1" />
+            <Plus className="w-4 h-4 mr-2" />
             Add User
           </Button>
         </div>
 
-        <Card className="p-4">
-          <div className="overflow-auto">
+        <Card>
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -174,24 +258,24 @@ export default function UsersPage() {
                   <TableHead>Mobile</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Last Login</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[140px]">Last Login</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map(user => (
+                {users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                            {getInitials(user.name)}
-                          </AvatarFallback>
+                        <Avatar className="h-9 w-9">
+                          <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
-                        <span className="font-medium text-sm">{user.name}</span>
+                        <div>
+                          <div className="font-medium">{user.name}</div>
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm">{user.mobile}</TableCell>
+                    <TableCell>{user.mobile}</TableCell>
                     <TableCell>
                       <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                         {user.role}
@@ -202,34 +286,32 @@ export default function UsersPage() {
                         {user.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {user.lastLogin}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
+                    <TableCell className="text-sm whitespace-nowrap">{user.lastLogin}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-center gap-2">
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="sm"
+                          onClick={() => handleViewActivity(user.id)}
+                          title="View Activity"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleEdit(user)}
+                          title="Edit User"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleResetPassword(user)}
-                        >
-                          <Key className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-danger"
+                          size="sm"
                           onClick={() => handleDelete(user.id)}
+                          title="Delete User"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 text-danger" />
                         </Button>
                       </div>
                     </TableCell>
@@ -241,102 +323,124 @@ export default function UsersPage() {
         </Card>
       </div>
 
+      {/* Add/Edit User Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingUser ? 'Edit User' : 'Add New User'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Name *</Label>
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Enter full name"
-              />
-            </div>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="permissions">Permissions</TabsTrigger>
+            </TabsList>
 
-            <div className="space-y-2">
-              <Label>Mobile *</Label>
-              <Input
-                value={formData.mobile}
-                onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-                placeholder="10 digit mobile number"
-                maxLength={10}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Role *</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value: 'admin' | 'staff') => 
-                  setFormData(prev => ({ ...prev, role: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="staff">Staff</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Status *</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: 'active' | 'inactive') =>
-                  setFormData(prev => ({ ...prev, status: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {!editingUser && (
-              <div className="space-y-2">
-                <Label>Password</Label>
-                <div className="flex gap-2">
+            <TabsContent value="basic" className="space-y-4 mt-4">
+              <div className="grid gap-4">
+                <div>
+                  <Label htmlFor="name">Name *</Label>
                   <Input
-                    value={generatedPassword}
-                    readOnly
-                    placeholder="Click generate to create password"
-                    className="flex-1"
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter full name"
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={generatePassword}
+                </div>
+
+                <div>
+                  <Label htmlFor="mobile">Mobile Number *</Label>
+                  <Input
+                    id="mobile"
+                    value={formData.mobile}
+                    onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                    placeholder="Enter mobile number"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">User will login using OTP on this number</p>
+                </div>
+
+                <div>
+                  <Label htmlFor="role">Role</Label>
+                  <Select
+                    value={formData.role}
+                    onValueChange={(value: 'admin' | 'staff') => 
+                      setFormData(prev => ({ ...prev, role: value }))
+                    }
                   >
-                    <Key className="w-4 h-4" />
-                  </Button>
-                  {generatedPassword && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={copyPassword}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  )}
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="staff">Staff</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: 'active' | 'inactive') => 
+                      setFormData(prev => ({ ...prev, status: value }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            )}
-          </div>
+            </TabsContent>
+
+            <TabsContent value="permissions" className="mt-4">
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-4 gap-4 pb-2 border-b font-semibold text-sm">
+                    <div>Module</div>
+                    <div className="text-center">View</div>
+                    <div className="text-center">Edit</div>
+                    <div className="text-center">Delete</div>
+                  </div>
+                  {formData.permissions.map((permission, index) => (
+                    <div key={permission.module} className="grid grid-cols-4 gap-4 items-center">
+                      <div className="font-medium">{permission.module}</div>
+                      <div className="flex justify-center">
+                        <Checkbox
+                          checked={permission.canView}
+                          onCheckedChange={(checked) => 
+                            updatePermission(index, 'canView', checked as boolean)
+                          }
+                        />
+                      </div>
+                      <div className="flex justify-center">
+                        <Checkbox
+                          checked={permission.canEdit}
+                          onCheckedChange={(checked) => 
+                            updatePermission(index, 'canEdit', checked as boolean)
+                          }
+                        />
+                      </div>
+                      <div className="flex justify-center">
+                        <Checkbox
+                          checked={permission.canDelete}
+                          onCheckedChange={(checked) => 
+                            updatePermission(index, 'canDelete', checked as boolean)
+                          }
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -346,6 +450,64 @@ export default function UsersPage() {
               {editingUser ? 'Update' : 'Add'} User
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Activity Timeline Dialog */}
+      <Dialog open={isActivityOpen} onOpenChange={setIsActivityOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>User Activity Timeline</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Button
+                variant={activityFilter === 'today' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActivityFilter('today')}
+              >
+                Today
+              </Button>
+              <Button
+                variant={activityFilter === 'week' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActivityFilter('week')}
+              >
+                Week
+              </Button>
+              <Button
+                variant={activityFilter === 'month' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActivityFilter('month')}
+              >
+                Month
+              </Button>
+            </div>
+
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-4">
+                {getFilteredActivities().length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No activity found for selected period
+                  </div>
+                ) : (
+                  getFilteredActivities().map((activity) => (
+                    <div key={activity.id} className="flex gap-4">
+                      <div className={`w-10 h-10 rounded-full ${getActivityIcon(activity.type)} flex items-center justify-center flex-shrink-0`}>
+                        <UserCog className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium">{activity.action}</div>
+                        <div className="text-sm text-muted-foreground">{activity.details}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{activity.timestamp}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </div>
         </DialogContent>
       </Dialog>
     </DashboardLayout>
