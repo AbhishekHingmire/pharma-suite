@@ -146,8 +146,66 @@ export function PurchaseDetailModal({ purchase, open, onOpenChange }: PurchaseDe
                 <span className="font-semibold">Total:</span>
                 <span className="text-lg font-bold">₹{purchase.total.toLocaleString('en-IN')}</span>
               </div>
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-muted-foreground">Payment Status:</span>
+                <Badge variant={purchase.paymentStatus === 'paid' ? 'default' : purchase.paymentStatus === 'pending' ? 'destructive' : 'secondary'} className="capitalize">
+                  {purchase.paymentStatus}
+                </Badge>
+              </div>
+              {purchase.paidAmount !== undefined && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Paid Amount:</span>
+                  <span className="font-medium">₹{purchase.paidAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              {purchase.paymentStatus !== 'paid' && purchase.paidAmount !== undefined && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Balance:</span>
+                  <span className="font-medium text-danger">₹{(purchase.total - purchase.paidAmount).toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              {purchase.transactionId && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Transaction ID:</span>
+                  <span className="font-medium">{purchase.transactionId}</span>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Payment Proof */}
+          {purchase.paymentProof && purchase.paymentProof.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h3 className="font-semibold">Payment Proof</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {purchase.paymentProof.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border">
+                      <img src={img} alt={`Payment proof ${idx + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Inventory Photos */}
+          {purchase.inventoryPhotos.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h3 className="font-semibold">Inventory Photos</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {purchase.inventoryPhotos.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border">
+                      <img src={img} alt={`Inventory ${idx + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

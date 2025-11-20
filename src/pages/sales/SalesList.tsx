@@ -135,7 +135,14 @@ export default function SalesList() {
                           </td>
                           <td className="p-4">
                             <div className="flex items-center justify-center">
-                              <Button variant="ghost" size="icon">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedSale(sale);
+                                  setIsModalOpen(true);
+                                }}
+                              >
                                 <Eye className="w-4 h-4" />
                               </Button>
                             </div>
@@ -171,7 +178,14 @@ export default function SalesList() {
                       <p className="text-sm text-muted-foreground">{sale.items.length} products</p>
                       <p className="text-lg font-bold">₹{sale.total.toLocaleString('en-IN')}</p>
                     </div>
-                    <Button variant="ghost" size="icon">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => {
+                        setSelectedSale(sale);
+                        setIsModalOpen(true);
+                      }}
+                    >
                       <Eye className="w-4 h-4" />
                     </Button>
                   </div>
