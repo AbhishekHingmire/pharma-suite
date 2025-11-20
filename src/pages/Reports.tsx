@@ -51,15 +51,19 @@ export default function Reports() {
     .map(p => {
       let totalQty = 0;
       let totalAmount = 0;
+      const brands = new Set<string>();
       filteredSales.forEach(sale => {
         sale.items.forEach(item => {
           if (item.productId === p.id) {
             totalQty += item.qty;
             totalAmount += item.amount;
+            if (item.brandName) {
+              brands.add(item.brandName);
+            }
           }
         });
       });
-      return { ...p, totalQty, totalAmount };
+      return { ...p, totalQty, totalAmount, brandName: Array.from(brands).join(', ') || '-' };
     })
     .filter(p => p.totalQty > 0)
     .sort((a, b) => b.totalAmount - a.totalAmount)
@@ -73,7 +77,7 @@ export default function Reports() {
     <DashboardLayout title="Reports">
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold mb-2">Business Reports</h2>
+          <h2 className="text-lg font-bold mb-2">Business Reports</h2>
           <p className="text-sm text-muted-foreground">
             Analyze your business performance and generate reports
           </p>
@@ -81,30 +85,45 @@ export default function Reports() {
 
         {/* Date Filter */}
         <Card className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dateFrom">From Date</Label>
-              <Input
-                id="dateFrom"
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-              />
+          <div className="space-y-3">
+            {/* Date Inputs - 2 columns on mobile/tablet, 3 columns on desktop */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="dateFrom">From Date</Label>
+                <Input
+                  id="dateFrom"
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dateTo">To Date</Label>
+                <Input
+                  id="dateTo"
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                />
+              </div>
+              {/* Buttons on desktop - aligned with inputs */}
+              <div className="hidden lg:flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
+                <Button onClick={() => { setDateFrom(''); setDateTo(''); }} className="w-full sm:w-auto">
+                  Clear Filters
+                </Button>
+                <Button variant="outline" className="w-full sm:w-auto">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export PDF
+                </Button>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="dateTo">To Date</Label>
-              <Input
-                id="dateTo"
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
-              <Button onClick={() => { setDateFrom(''); setDateTo(''); }} className="w-full sm:w-auto">
+            
+            {/* Buttons on mobile/tablet - separate row */}
+            <div className="flex lg:hidden flex-row gap-2">
+              <Button onClick={() => { setDateFrom(''); setDateTo(''); }} className="flex-1">
                 Clear Filters
               </Button>
-              <Button variant="outline" className="w-full sm:w-auto">
+              <Button variant="outline" className="flex-1">
                 <Download className="w-4 h-4 mr-2" />
                 Export PDF
               </Button>
@@ -113,12 +132,12 @@ export default function Reports() {
         </Card>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           <Card className="p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Total Sales</p>
-                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(totalSales)}>
+                <h3 className="text-lg font-bold mt-1 truncate" title={formatAmount(totalSales)}>
                   <span className="md:hidden">{formatCompactAmount(totalSales)}</span>
                   <span className="hidden md:inline">{formatAmount(totalSales)}</span>
                 </h3>
@@ -136,7 +155,7 @@ export default function Reports() {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Total Purchases</p>
-                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(totalPurchases)}>
+                <h3 className="text-lg font-bold mt-1 truncate" title={formatAmount(totalPurchases)}>
                   <span className="md:hidden">{formatCompactAmount(totalPurchases)}</span>
                   <span className="hidden md:inline">{formatAmount(totalPurchases)}</span>
                 </h3>
@@ -154,12 +173,12 @@ export default function Reports() {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Gross Profit</p>
-                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(grossProfit)}>
+                <h3 className="text-lg font-bold mt-1 truncate" title={formatAmount(grossProfit)}>
                   <span className="md:hidden">{formatCompactAmount(grossProfit)}</span>
                   <span className="hidden md:inline">{formatAmount(grossProfit)}</span>
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {totalSales > 0 ? ((grossProfit / totalSales) * 100).toFixed(1) : 0}% margin
+                  Margin: {((grossProfit / totalSales) * 100).toFixed(1)}%
                 </p>
               </div>
               <div className="p-2 bg-blue-500/10 rounded flex-shrink-0">
@@ -172,7 +191,7 @@ export default function Reports() {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Outstanding</p>
-                <h3 className="text-xl font-bold mt-1 truncate" title={formatAmount(totalOutstanding)}>
+                <h3 className="text-lg font-bold mt-1 truncate" title={formatAmount(totalOutstanding)}>
                   <span className="md:hidden">{formatCompactAmount(totalOutstanding)}</span>
                   <span className="hidden md:inline">{formatAmount(totalOutstanding)}</span>
                 </h3>
@@ -190,7 +209,7 @@ export default function Reports() {
         {/* Top Customers */}
         <Card className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Top 10 Customers</h3>
+            <h3 className="text-md font-bold">Top 10 Customers</h3>
             <Button variant="outline" size="sm">
               <Download className="w-4 h-4 mr-2" />
               Export
@@ -198,8 +217,8 @@ export default function Reports() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
-                <tr className="bg-muted/50">
+              <thead className="bg-muted/50">
+                <tr>
                   <th className="text-left p-3 text-xs font-semibold uppercase">Rank</th>
                   <th className="text-left p-3 text-xs font-semibold uppercase">Customer</th>
                   <th className="text-left p-3 text-xs font-semibold uppercase">Type</th>
@@ -231,7 +250,7 @@ export default function Reports() {
         {/* Top Products */}
         <Card className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Top 10 Products</h3>
+            <h3 className="text-md font-bold">Top 10 Products</h3>
             <Button variant="outline" size="sm">
               <Download className="w-4 h-4 mr-2" />
               Export
@@ -239,11 +258,11 @@ export default function Reports() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b">
-                <tr className="bg-muted/50">
+              <thead className="bg-muted/50">
+                <tr>
                   <th className="text-left p-3 text-xs font-semibold uppercase">Rank</th>
                   <th className="text-left p-3 text-xs font-semibold uppercase">Product</th>
-                  <th className="text-left p-3 text-xs font-semibold uppercase">Company</th>
+                  <th className="text-left p-3 text-xs font-semibold uppercase">Brand</th>
                   <th className="text-left p-3 text-xs font-semibold uppercase">Quantity Sold</th>
                   <th className="text-left p-3 text-xs font-semibold uppercase">Total Revenue</th>
                 </tr>
@@ -253,7 +272,7 @@ export default function Reports() {
                   <tr key={product.id} className="border-b hover:bg-muted/30">
                     <td className="p-3 text-sm font-bold">#{index + 1}</td>
                     <td className="p-3 text-sm font-medium truncate max-w-[200px]">{product.name}</td>
-                    <td className="p-3 text-sm truncate max-w-[150px]">{getCompanyName(product.companyId)}</td>
+                    <td className="p-3 text-sm truncate max-w-[150px]">{product.brandName}</td>
                     <td className="p-3 text-sm">{product.totalQty} units</td>
                     <td className="p-3 text-sm font-semibold truncate max-w-[150px]" title={formatAmount(product.totalAmount)}>
                       {formatCompactAmount(product.totalAmount)}

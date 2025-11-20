@@ -116,7 +116,7 @@ export default function Customers() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xl font-semibold">Manage Customers</h2>
+            <h2 className="text-lg font-bold">Manage Customers</h2>
             <p className="text-sm text-muted-foreground">{customers.length} customers</p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
@@ -265,7 +265,7 @@ export default function Customers() {
         {filteredCustomers.length === 0 ? (
           <Card className="p-8 text-center">
             <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground mb-4">No customers found</p>
+            <p className="text-sm text-muted-foreground mb-4">No customers found</p>
             <Button onClick={() => setIsDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add First Customer
@@ -278,8 +278,8 @@ export default function Customers() {
               <Card>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b">
-                      <tr className="bg-muted/50">
+                    <thead className="bg-muted/50">
+                      <tr>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Customer</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Type</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Phone</th>

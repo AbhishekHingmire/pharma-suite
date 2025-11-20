@@ -22,12 +22,11 @@ export interface Company {
 
 export interface Product {
   id: number;
-  name: string;
+  name: string; // Generic name e.g., "Paracetamol 500mg"
   generic: string;
   hsn: string;
-  gst: number;
+  gst: number; // Can be 0, 5, 12, 18, or 28
   packing: string;
-  companyId: number;
   minStock: number;
   status: 'active' | 'inactive';
 }
@@ -48,11 +47,13 @@ export interface Customer {
 
 export interface PurchaseItem {
   productId: number;
+  companyId: number; // Which company supplied this
+  brandName: string; // Brand name e.g., "Dolo-650", "Crocin"
   qty: number;
   freeQty: number;
   batch: string;
   expiry: string;
-  rate: number;
+  rate: number; // Cost per unit
   amount: number;
 }
 
@@ -76,9 +77,11 @@ export interface Purchase {
 
 export interface SalesItem {
   productId: number;
+  companyId: number; // Company/brand sold from
+  brandName: string; // Brand name shown on invoice
   qty: number;
   batch: string;
-  rate: number;
+  rate: number; // Selling price
   amount: number;
 }
 
@@ -97,11 +100,13 @@ export interface Sale {
 
 export interface InventoryBatch {
   productId: number;
+  companyId: number; // Which company supplied
+  brandName: string; // Brand name for this batch
   batch: string;
   qty: number;
   purchaseDate: string;
   expiry: string;
-  rate: number;
+  rate: number; // Cost per unit
 }
 
 export interface Scheme {
@@ -120,14 +125,16 @@ export interface Scheme {
 }
 
 export interface RateMaster {
-  customerId: number;
+  customerType: 'A' | 'B' | 'C'; // Changed from customerId to customerType
   productId: number;
-  rate: number;
+  marginPercent: number; // Margin percentage (e.g., 30 for 30%)
+  minPrice?: number; // Optional minimum selling price floor
 }
 
 export interface Payment {
   id: number;
   customerId: number;
+  saleId?: number; // Reference to specific sale if applicable
   amount: number;
   date: string;
   mode: 'cash' | 'card' | 'upi' | 'netbanking' | 'cheque';

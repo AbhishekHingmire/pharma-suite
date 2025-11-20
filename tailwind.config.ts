@@ -16,6 +16,17 @@ export default {
       fontFamily: {
         sans: ['Poppins', 'system-ui', '-apple-system', 'sans-serif'],
       },
+      fontSize: {
+        'xs': '0.625rem',     // 10px - very small text
+        'sm': '0.6875rem',    // 11px - captions, hints
+        'base': '0.8125rem',  // 13px - labels, small text
+        'md': '0.875rem',     // 14px - body text, buttons, inputs
+        'lg': '1rem',         // 16px - H4, larger labels
+        'xl': '1.125rem',     // 18px - H3
+        '2xl': '1.25rem',     // 20px - H2, dashboard numbers
+        '3xl': '1.5rem',      // 24px - H1
+        '4xl': '1.75rem',     // 28px - metric card values
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

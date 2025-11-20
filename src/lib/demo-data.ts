@@ -9,16 +9,16 @@ export const demoCompanies: Company[] = [
 ];
 
 export const demoProducts: Product[] = [
-  { id: 1, name: "Dolo-650", generic: "Paracetamol", hsn: "30049099", gst: 12, packing: "10x10", companyId: 1, minStock: 50, status: 'active' },
-  { id: 2, name: "Augmentin 625", generic: "Amoxicillin+Clavulanic Acid", hsn: "30042000", gst: 12, packing: "10x10", companyId: 2, minStock: 30, status: 'active' },
-  { id: 3, name: "Crocin Advance", generic: "Paracetamol", hsn: "30049099", gst: 12, packing: "15x10", companyId: 3, minStock: 40, status: 'active' },
-  { id: 4, name: "Pan-D", generic: "Pantoprazole+Domperidone", hsn: "30049011", gst: 12, packing: "10x15", companyId: 1, minStock: 50, status: 'active' },
-  { id: 5, name: "Azithral 500", generic: "Azithromycin", hsn: "30042090", gst: 12, packing: "3x10", companyId: 2, minStock: 20, status: 'active' },
-  { id: 6, name: "Sinarest", generic: "Paracetamol+Phenylephrine", hsn: "30049099", gst: 12, packing: "10x10", companyId: 4, minStock: 30, status: 'active' },
-  { id: 7, name: "Combiflam", generic: "Ibuprofen+Paracetamol", hsn: "30049099", gst: 12, packing: "20x10", companyId: 3, minStock: 60, status: 'active' },
-  { id: 8, name: "Allegra 120", generic: "Fexofenadine", hsn: "30049059", gst: 12, packing: "10x10", companyId: 1, minStock: 25, status: 'active' },
-  { id: 9, name: "Avomine", generic: "Promethazine", hsn: "30049039", gst: 12, packing: "10x10", companyId: 5, minStock: 20, status: 'active' },
-  { id: 10, name: "Benadryl Cough", generic: "Diphenhydramine", hsn: "30049049", gst: 18, packing: "100ml", companyId: 4, minStock: 15, status: 'active' }
+  { id: 1, name: "Paracetamol 500mg", generic: "Paracetamol", hsn: "30049099", gst: 12, packing: "10x10", minStock: 50, status: 'active' },
+  { id: 2, name: "Amoxicillin+Clavulanic Acid 625mg", generic: "Amoxicillin+Clavulanic Acid", hsn: "30042000", gst: 12, packing: "10x10", minStock: 30, status: 'active' },
+  { id: 3, name: "Pantoprazole+Domperidone", generic: "Pantoprazole+Domperidone", hsn: "30049011", gst: 12, packing: "10x15", minStock: 50, status: 'active' },
+  { id: 4, name: "Azithromycin 500mg", generic: "Azithromycin", hsn: "30042090", gst: 12, packing: "3x10", minStock: 20, status: 'active' },
+  { id: 5, name: "Paracetamol+Phenylephrine", generic: "Paracetamol+Phenylephrine", hsn: "30049099", gst: 12, packing: "10x10", minStock: 30, status: 'active' },
+  { id: 6, name: "Ibuprofen+Paracetamol", generic: "Ibuprofen+Paracetamol", hsn: "30049099", gst: 5, packing: "20x10", minStock: 60, status: 'active' },
+  { id: 7, name: "Fexofenadine 120mg", generic: "Fexofenadine", hsn: "30049059", gst: 12, packing: "10x10", minStock: 25, status: 'active' },
+  { id: 8, name: "Promethazine", generic: "Promethazine", hsn: "30049039", gst: 18, packing: "10x10", minStock: 20, status: 'active' },
+  { id: 9, name: "Diphenhydramine Syrup", generic: "Diphenhydramine", hsn: "30049049", gst: 18, packing: "100ml", minStock: 15, status: 'active' },
+  { id: 10, name: "Cetirizine 10mg", generic: "Cetirizine", hsn: "30049050", gst: 12, packing: "10x10", minStock: 40, status: 'active' }
 ];
 
 export const demoCustomers: Customer[] = [
@@ -35,16 +35,24 @@ export const demoSchemes: Scheme[] = [
 ];
 
 export const demoRateMaster: RateMaster[] = [
-  { customerId: 1, productId: 1, rate: 95.90 },
-  { customerId: 2, productId: 1, rate: 95.90 },
-  { customerId: 3, productId: 1, rate: 105.90 },
-  { customerId: 4, productId: 1, rate: 105.90 },
-  { customerId: 5, productId: 1, rate: 110.90 },
-  { customerId: 1, productId: 2, rate: 185.00 },
-  { customerId: 2, productId: 2, rate: 185.00 },
-  { customerId: 3, productId: 2, rate: 195.00 },
-  { customerId: 4, productId: 2, rate: 195.00 },
-  { customerId: 5, productId: 2, rate: 205.00 },
+  // Type A customers - 30% margin
+  { customerType: 'A', productId: 1, marginPercent: 30 },
+  { customerType: 'A', productId: 2, marginPercent: 30 },
+  { customerType: 'A', productId: 3, marginPercent: 30 },
+  { customerType: 'A', productId: 4, marginPercent: 28 },
+  { customerType: 'A', productId: 5, marginPercent: 30 },
+  // Type B customers - 40% margin
+  { customerType: 'B', productId: 1, marginPercent: 40 },
+  { customerType: 'B', productId: 2, marginPercent: 40 },
+  { customerType: 'B', productId: 3, marginPercent: 38 },
+  { customerType: 'B', productId: 4, marginPercent: 40 },
+  { customerType: 'B', productId: 5, marginPercent: 42 },
+  // Type C customers - 50% margin
+  { customerType: 'C', productId: 1, marginPercent: 50 },
+  { customerType: 'C', productId: 2, marginPercent: 50 },
+  { customerType: 'C', productId: 3, marginPercent: 48 },
+  { customerType: 'C', productId: 4, marginPercent: 50, minPrice: 200 },
+  { customerType: 'C', productId: 5, marginPercent: 55 },
 ];
 
 export const demoPurchases: Purchase[] = [
@@ -54,13 +62,14 @@ export const demoPurchases: Purchase[] = [
     invoiceNo: "SP/2025/001",
     date: "2025-01-05",
     items: [
-      { productId: 1, qty: 100, freeQty: 10, batch: "DL2401", expiry: "2026-12-31", rate: 90.90, amount: 9090 }
+      { productId: 1, companyId: 1, brandName: "Dolo-650", qty: 100, freeQty: 10, batch: "DL2401", expiry: "2026-12-31", rate: 90.90, amount: 9090 },
+      { productId: 3, companyId: 1, brandName: "Pan-D", qty: 80, freeQty: 0, batch: "PD2403", expiry: "2026-11-30", rate: 95, amount: 7600 }
     ],
-    subtotal: 9090,
-    gst: 1090.80,
-    total: 10180.80,
+    subtotal: 16690,
+    gst: 2002.80,
+    total: 18692.80,
     paymentStatus: 'paid',
-    paidAmount: 10180.80,
+    paidAmount: 18692.80,
     inventoryPhotos: [],
     createdAt: "2025-01-05T10:30:00.000Z"
   },
@@ -70,14 +79,48 @@ export const demoPurchases: Purchase[] = [
     invoiceNo: "CIP/2025/045",
     date: "2024-12-20",
     items: [
-      { productId: 2, qty: 100, freeQty: 0, batch: "AU2402", expiry: "2025-06-30", rate: 165, amount: 16500 }
+      { productId: 2, companyId: 2, brandName: "Augmentin 625", qty: 100, freeQty: 0, batch: "AU2402", expiry: "2025-06-30", rate: 165, amount: 16500 },
+      { productId: 4, companyId: 2, brandName: "Azithral 500", qty: 50, freeQty: 5, batch: "AZ2404", expiry: "2025-11-30", rate: 125, amount: 6250 }
     ],
-    subtotal: 16500,
-    gst: 1980,
-    total: 18480,
-    paymentStatus: 'pending',
+    subtotal: 22750,
+    gst: 2730,
+    total: 25480,
+    paymentStatus: 'partial',
+    paidAmount: 15000,
     inventoryPhotos: [],
     createdAt: "2024-12-20T14:15:00.000Z"
+  },
+  {
+    id: 3,
+    companyId: 3,
+    invoiceNo: "DRD/2025/112",
+    date: "2025-01-10",
+    items: [
+      { productId: 1, companyId: 3, brandName: "Crocin Advance", qty: 150, freeQty: 0, batch: "CR2501", expiry: "2026-06-30", rate: 88, amount: 13200 },
+      { productId: 6, companyId: 3, brandName: "Combiflam", qty: 100, freeQty: 10, batch: "CF2501", expiry: "2026-08-31", rate: 72, amount: 7200 }
+    ],
+    subtotal: 20400,
+    gst: 2376,
+    total: 22776,
+    paymentStatus: 'pending',
+    inventoryPhotos: [],
+    createdAt: "2025-01-10T09:20:00.000Z"
+  },
+  {
+    id: 4,
+    companyId: 4,
+    invoiceNo: "LUP/2024/789",
+    date: "2024-11-15",
+    items: [
+      { productId: 5, companyId: 4, brandName: "Sinarest", qty: 60, freeQty: 0, batch: "SN2411", expiry: "2025-05-15", rate: 82, amount: 4920 }
+    ],
+    subtotal: 4920,
+    gst: 590.40,
+    total: 5510.40,
+    paymentStatus: 'paid',
+    paidAmount: 5510.40,
+    inventoryPhotos: [],
+    createdAt: "2024-11-15T11:45:00.000Z"
   }
 ];
 
@@ -88,11 +131,11 @@ export const demoSales: Sale[] = [
     invoiceNo: "RM/2025/001",
     date: "2025-01-06",
     items: [
-      { productId: 1, qty: 50, batch: "DL2401", rate: 95.90, amount: 4795 }
+      { productId: 1, companyId: 1, brandName: "Dolo-650", qty: 50, batch: "DL2401", rate: 118.17, amount: 5908.50 }
     ],
-    subtotal: 4795,
-    gst: 575.40,
-    total: 5370.40,
+    subtotal: 5908.50,
+    gst: 709.02,
+    total: 6617.52,
     status: 'unpaid'
   },
   {
@@ -101,22 +144,59 @@ export const demoSales: Sale[] = [
     invoiceNo: "RM/2025/002",
     date: "2025-01-08",
     items: [
-      { productId: 2, qty: 30, batch: "AU2402", rate: 185, amount: 5550 }
+      { productId: 2, companyId: 2, brandName: "Augmentin 625", qty: 30, batch: "AU2402", rate: 214.50, amount: 6435 }
     ],
-    subtotal: 5550,
-    gst: 666,
-    total: 6216,
+    subtotal: 6435,
+    gst: 772.20,
+    total: 7207.20,
     status: 'paid',
-    paidAmount: 6216
+    paidAmount: 7207.20
+  },
+  {
+    id: 3,
+    customerId: 3,
+    invoiceNo: "RM/2025/003",
+    date: "2025-01-12",
+    items: [
+      { productId: 1, companyId: 3, brandName: "Crocin Advance", qty: 80, batch: "CR2501", rate: 123.20, amount: 9856 },
+      { productId: 6, companyId: 3, brandName: "Combiflam", qty: 50, batch: "CF2501", rate: 100.80, amount: 5040 }
+    ],
+    subtotal: 14896,
+    gst: 1637.56,
+    total: 16533.56,
+    status: 'partial',
+    paidAmount: 10000
+  },
+  {
+    id: 4,
+    customerId: 5,
+    invoiceNo: "RM/2025/004",
+    date: "2025-01-15",
+    items: [
+      { productId: 5, companyId: 4, brandName: "Sinarest", qty: 40, batch: "SN2411", rate: 127.10, amount: 5084 }
+    ],
+    subtotal: 5084,
+    gst: 610.08,
+    total: 5694.08,
+    status: 'unpaid'
   }
 ];
 
 export const demoInventory: InventoryBatch[] = [
-  { productId: 1, batch: "DL2401", qty: 60, purchaseDate: "2025-01-05", expiry: "2026-12-31", rate: 90.90 },
-  { productId: 2, batch: "AU2402", qty: 70, purchaseDate: "2024-12-20", expiry: "2025-06-30", rate: 165 },
-  { productId: 3, batch: "CR2501", qty: 100, purchaseDate: "2025-01-10", expiry: "2026-06-30", rate: 88 },
-  { productId: 4, batch: "PD2403", qty: 80, purchaseDate: "2024-11-15", expiry: "2025-05-15", rate: 95 },
-  { productId: 5, batch: "AZ2404", qty: 45, purchaseDate: "2024-12-01", expiry: "2025-11-30", rate: 125 },
+  // Paracetamol from different brands/companies
+  { productId: 1, companyId: 1, brandName: "Dolo-650", batch: "DL2401", qty: 60, purchaseDate: "2025-01-05", expiry: "2026-12-31", rate: 90.90 },
+  { productId: 1, companyId: 3, brandName: "Crocin Advance", batch: "CR2501", qty: 70, purchaseDate: "2025-01-10", expiry: "2026-06-30", rate: 88 },
+  
+  // Other products
+  { productId: 2, companyId: 2, brandName: "Augmentin 625", batch: "AU2402", qty: 70, purchaseDate: "2024-12-20", expiry: "2025-06-30", rate: 165 },
+  { productId: 3, companyId: 1, brandName: "Pan-D", batch: "PD2403", qty: 80, purchaseDate: "2025-01-05", expiry: "2026-11-30", rate: 95 },
+  { productId: 4, companyId: 2, brandName: "Azithral 500", batch: "AZ2404", qty: 55, purchaseDate: "2024-12-20", expiry: "2025-11-30", rate: 125 },
+  { productId: 5, companyId: 4, brandName: "Sinarest", batch: "SN2411", qty: 20, purchaseDate: "2024-11-15", expiry: "2025-05-15", rate: 82 },
+  { productId: 6, companyId: 3, brandName: "Combiflam", batch: "CF2501", qty: 60, purchaseDate: "2025-01-10", expiry: "2026-08-31", rate: 72 },
+  
+  // Some expired/expiring soon
+  { productId: 7, companyId: 1, brandName: "Allegra 120", batch: "AL2412", qty: 25, purchaseDate: "2024-12-01", expiry: "2025-01-31", rate: 145 },
+  { productId: 8, companyId: 5, brandName: "Avomine", batch: "AV2403", qty: 15, purchaseDate: "2024-03-20", expiry: "2024-12-31", rate: 38 },
 ];
 
 export const demoPayments: Payment[] = [

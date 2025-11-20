@@ -57,7 +57,7 @@ export default function Dashboard() {
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Today's Sales</p>
                 <p 
-                  className="text-lg md:text-2xl font-bold truncate" 
+                  className="text-lg font-bold truncate" 
                   title={formatAmount(todaySales)}
                 >
                   <span className="md:hidden">{formatCompactAmount(todaySales)}</span>
@@ -77,9 +77,9 @@ export default function Dashboard() {
           <Card className="p-3 md:p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Purchases</p>
+                <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Total Purchases</p>
                 <p 
-                  className="text-lg md:text-2xl font-bold truncate"
+                  className="text-lg font-bold truncate"
                   title={formatAmount(totalPurchases)}
                 >
                   <span className="md:hidden">{formatCompactAmount(totalPurchases)}</span>
@@ -97,7 +97,7 @@ export default function Dashboard() {
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Outstanding</p>
                 <p 
-                  className="text-lg md:text-2xl font-bold text-danger truncate"
+                  className="text-lg font-bold text-danger truncate"
                   title={formatAmount(totalOutstanding)}
                 >
                   <span className="md:hidden">{formatCompactAmount(totalOutstanding)}</span>
@@ -115,7 +115,7 @@ export default function Dashboard() {
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Stock Value</p>
                 <p 
-                  className="text-lg md:text-2xl font-bold truncate"
+                  className="text-lg font-bold truncate"
                   title={formatAmount(stockValue)}
                 >
                   <span className="md:hidden">{formatCompactAmount(stockValue)}</span>

@@ -109,32 +109,32 @@ export default function SalesList() {
               <Card>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-4 font-semibold">Date</th>
-                        <th className="text-left p-4 font-semibold">Invoice No</th>
-                        <th className="text-left p-4 font-semibold">Customer</th>
-                        <th className="text-right p-4 font-semibold">Products</th>
-                        <th className="text-right p-4 font-semibold">Amount</th>
-                        <th className="text-center p-4 font-semibold">Status</th>
-                        <th className="text-center p-4 font-semibold">Actions</th>
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left p-3 text-sm font-semibold uppercase">Date</th>
+                        <th className="text-left p-3 text-sm font-semibold uppercase">Invoice No</th>
+                        <th className="text-left p-3 text-sm font-semibold uppercase">Customer</th>
+                        <th className="text-right p-3 text-sm font-semibold uppercase">Products</th>
+                        <th className="text-right p-3 text-sm font-semibold uppercase">Amount</th>
+                        <th className="text-center p-3 text-sm font-semibold uppercase">Status</th>
+                        <th className="text-center p-3 text-sm font-semibold uppercase">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredSales.map((sale) => (
                         <tr key={sale.id} className="border-b last:border-0 hover:bg-muted/50">
-                          <td className="p-4">{new Date(sale.date).toLocaleDateString()}</td>
-                          <td className="p-4 font-medium">{sale.invoiceNo}</td>
-                          <td className="p-4">{getCustomerName(sale.customerId)}</td>
-                          <td className="p-4 text-right">{sale.items.length}</td>
-                          <td className="p-4 text-right font-semibold truncate max-w-[150px]" title={formatAmount(sale.total)}>
+                          <td className="p-3 text-sm">{new Date(sale.date).toLocaleDateString()}</td>
+                          <td className="p-3 text-sm font-medium">{sale.invoiceNo}</td>
+                          <td className="p-3 text-sm">{getCustomerName(sale.customerId)}</td>
+                          <td className="p-3 text-sm text-right">{sale.items.length}</td>
+                          <td className="p-3 text-sm text-right font-semibold truncate max-w-[150px]" title={formatAmount(sale.total)}>
                             <span className="md:hidden">{formatCompactAmount(sale.total)}</span>
                             <span className="hidden md:inline">{formatAmount(sale.total)}</span>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="p-3 text-center">
                             {getStatusBadge(sale.status)}
                           </td>
-                          <td className="p-4">
+                          <td className="p-3">
                             <div className="flex items-center justify-center">
                               <Button 
                                 variant="ghost" 

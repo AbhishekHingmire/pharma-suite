@@ -14,14 +14,14 @@ export default function Settings() {
     <DashboardLayout title="Settings">
       <div className="max-w-2xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Company Settings</h2>
+          <h2 className="text-lg font-bold mb-2">Company Settings</h2>
           <p className="text-muted-foreground">
             Manage your company profile and preferences
           </p>
         </div>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Business Information</h3>
+          <h3 className="text-md font-bold mb-4">Business Information</h3>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="businessName">Business Name</Label>
@@ -47,7 +47,7 @@ export default function Settings() {
         </Card>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Banking Details</h3>
+          <h3 className="text-md font-bold mb-4">Banking Details</h3>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="bankName">Bank Name</Label>
@@ -65,7 +65,7 @@ export default function Settings() {
         </Card>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Invoice Settings</h3>
+          <h3 className="text-md font-bold mb-4">Invoice Settings</h3>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="invoicePrefix">Invoice Prefix</Label>

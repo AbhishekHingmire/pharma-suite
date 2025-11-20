@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 
 export default function Schemes() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<'all' | 'active' | 'upcoming' | 'expired'>('active');
+  const [filter, setFilter] = useState<'active' | 'upcoming' | 'expired'>('active');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingScheme, setEditingScheme] = useState<Scheme | null>(null);
   const [formData, setFormData] = useState<Partial<Scheme>>({
@@ -68,7 +68,6 @@ export default function Schemes() {
       const matchesSearch = getCompanyName(s.companyId).toLowerCase().includes(searchTerm.toLowerCase());
       const status = getSchemeStatus(s);
       
-      if (filter === 'all') return matchesSearch;
       return matchesSearch && status === filter;
     })
     .sort((a, b) => new Date(b.validFrom).getTime() - new Date(a.validFrom).getTime());
@@ -152,7 +151,7 @@ export default function Schemes() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xl font-semibold">Manage Schemes</h2>
+            <h2 className="text-lg font-bold">Manage Schemes</h2>
             <p className="text-sm text-muted-foreground">{schemes.length} schemes</p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
@@ -304,13 +303,6 @@ export default function Schemes() {
         {/* Filter Buttons */}
         <div className="flex gap-2 overflow-x-auto">
           <Button
-            variant={filter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('all')}
-          >
-            All
-          </Button>
-          <Button
             variant={filter === 'active' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('active')}
@@ -343,48 +335,51 @@ export default function Schemes() {
             </Button>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredSchemes.map((scheme) => {
               const status = getSchemeStatus(scheme);
               const daysLeft = getDaysRemaining(scheme.validTo);
               
               return (
-                <Card key={scheme.id} className={`p-4 border-l-4 ${getStatusColor(status)}`}>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-start">
+                <Card key={scheme.id} className={`p-2.5 border-l-4 ${getStatusColor(status)} hover:shadow-md transition-shadow bg-card`}>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-start gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium">{getCompanyName(scheme.companyId)}</div>
-                        <div className="text-sm text-muted-foreground mt-1">
+                        <div className="text-md font-semibold text-foreground">{getCompanyName(scheme.companyId)}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
                           {getSchemeDescription(scheme)}
                         </div>
                       </div>
-                      <Badge className={`${getStatusColor(status)} text-white`}>
+                      <Badge className={`${getStatusColor(status)} text-white text-xs shrink-0`}>
                         {status}
                       </Badge>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Calendar className="w-3 h-3" />
-                      <span>
-                        {format(new Date(scheme.validFrom), 'dd MMM')} - {format(new Date(scheme.validTo), 'dd MMM yyyy')}
-                      </span>
-                    </div>
-
-                    {status === 'active' && daysLeft > 0 && (
-                      <div className="text-xs">
-                        <Badge variant="outline" className="text-success border-success">
-                          {daysLeft} days remaining
-                        </Badge>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Calendar className="w-3 h-3 shrink-0" />
+                        <span className="truncate">
+                          {format(new Date(scheme.validFrom), 'dd MMM')} - {format(new Date(scheme.validTo), 'dd MMM yyyy')}
+                        </span>
                       </div>
-                    )}
-
-                    <div className="flex justify-end gap-2 pt-2 border-t">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(scheme)}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDelete(scheme.id)}>
-                        <Trash2 className="w-4 h-4 text-danger" />
-                      </Button>
+                      
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {status === 'active' && daysLeft > 0 && (
+                          <Badge variant="outline" className="text-success border-success text-xs">
+                            {daysLeft}d Remaining
+                          </Badge>
+                        )}
+                        {status !== 'expired' && (
+                          <>
+                            <Button variant="outline" size="sm" onClick={() => handleEdit(scheme)}>
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleDelete(scheme.id)}>
+                              <Trash2 className="w-4 h-4 text-danger" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Card>

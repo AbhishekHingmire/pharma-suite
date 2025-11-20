@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { getFromStorage } from '@/lib/storage';
 import { Purchase, Company, Product } from '@/types';
@@ -78,8 +79,8 @@ export function PurchaseDetailModal({ purchase, open, onOpenChange }: PurchaseDe
 
           <Separator />
 
-          {/* Products */}
-          <div className="space-y-3">
+          {/* Products - Desktop Table */}
+          <div className="space-y-3 hidden md:block">
             <div className="flex items-center gap-2">
               <Package className="w-4 h-4 text-muted-foreground" />
               <h3 className="font-semibold">Products</h3>
@@ -121,6 +122,50 @@ export function PurchaseDetailModal({ purchase, open, onOpenChange }: PurchaseDe
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          {/* Products - Mobile Cards */}
+          <div className="space-y-3 md:hidden">
+            <div className="flex items-center gap-2">
+              <Package className="w-4 h-4 text-muted-foreground" />
+              <h3 className="font-semibold">Products</h3>
+            </div>
+            <div className="space-y-2">
+              {purchase.items.map((item, index) => (
+                <Card key={index} className="p-3">
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{getProductName(item.productId)}</p>
+                        <p className="text-xs text-muted-foreground">Batch: {item.batch}</p>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        ₹{item.amount.toLocaleString('en-IN')}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">Expiry</p>
+                        <p className="font-medium">{format(new Date(item.expiry), 'MMM yy')}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">Qty</p>
+                        <p className="font-medium">
+                          {item.qty}
+                          {item.freeQty > 0 && (
+                            <span className="text-success ml-1">+{item.freeQty}</span>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">Rate</p>
+                        <p className="font-medium">₹{item.rate.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           </div>
 

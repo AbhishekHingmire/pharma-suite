@@ -107,7 +107,7 @@ export default function Products() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xl font-semibold">Manage Products</h2>
+            <h2 className="text-lg font-bold">Manage Products</h2>
             <p className="text-sm text-muted-foreground">{products.length} products</p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
@@ -259,8 +259,8 @@ export default function Products() {
               <Card>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b">
-                      <tr className="bg-muted/50">
+                    <thead className="bg-muted/50">
+                      <tr>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Product</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Generic</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Company</th>

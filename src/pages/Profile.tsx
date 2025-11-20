@@ -78,7 +78,7 @@ export default function Profile() {
     <DashboardLayout title="My Profile">
       <div className="max-w-2xl space-y-6">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Profile Information</h2>
+          <h2 className="text-lg font-bold mb-2">Profile Information</h2>
           <p className="text-muted-foreground">
             View and manage your personal information
           </p>
@@ -90,7 +90,7 @@ export default function Profile() {
               <User className="w-10 h-10 text-primary" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold">{user?.name}</h3>
+              <h3 className="text-lg font-bold">{user?.name}</h3>
               <p className="text-sm text-muted-foreground capitalize">{user?.role}</p>
             </div>
           </div>

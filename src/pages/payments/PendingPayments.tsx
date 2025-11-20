@@ -81,8 +81,8 @@ export default function PendingPayments() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">Payment Management</h2>
-            <p className="text-muted-foreground">
+            <h2 className="text-lg font-bold">Payment Management</h2>
+            <p className="text-md text-muted-foreground">
               Track pending and completed payments
             </p>
           </div>
@@ -103,26 +103,26 @@ export default function PendingPayments() {
               <Card>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-4 font-semibold">Customer</th>
-                        <th className="text-left p-4 font-semibold">Invoice No</th>
-                        <th className="text-left p-4 font-semibold min-w-[140px]">Date & Time</th>
-                        <th className="text-right p-4 font-semibold">Amount</th>
-                        <th className="text-right p-4 font-semibold">Days Overdue</th>
-                        <th className="text-center p-4 font-semibold">Status</th>
-                        <th className="text-center p-4 font-semibold">Action</th>
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left p-3 text-xs font-semibold uppercase">Customer</th>
+                        <th className="text-left p-3 text-xs font-semibold uppercase">Invoice No</th>
+                        <th className="text-left p-3 text-xs font-semibold uppercase min-w-[140px]">Date & Time</th>
+                        <th className="text-left p-3 text-xs font-semibold uppercase">Amount</th>
+                        <th className="text-left p-3 text-xs font-semibold uppercase">Days Overdue</th>
+                        <th className="text-center p-3 text-xs font-semibold uppercase">Status</th>
+                        <th className="text-center p-3 text-xs font-semibold uppercase">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {sales.map((sale) => {
                         const daysOverdue = getDaysOverdue(sale.date);
                         return (
-                          <tr key={sale.id} className="border-b last:border-0 hover:bg-muted/50">
-                            <td className="p-4 font-medium">{getCustomerName(sale.customerId)}</td>
-                            <td className="p-4">{sale.invoiceNo}</td>
-                            <td className="p-4 min-w-[140px]">
-                              <div className="text-sm whitespace-nowrap">{format(new Date(sale.date), 'dd MMM yyyy')}</div>
+                          <tr key={sale.id} className="border-b hover:bg-muted/30">
+                            <td className="p-3 text-sm font-medium">{getCustomerName(sale.customerId)}</td>
+                            <td className="p-3 text-sm">{sale.invoiceNo}</td>
+                            <td className="p-3 text-sm min-w-[140px]">
+                              <div className="whitespace-nowrap">{format(new Date(sale.date), 'dd MMM yyyy')}</div>
                               <div className="text-xs text-muted-foreground whitespace-nowrap">
                                 {new Date(sale.date).toLocaleTimeString('en-IN', { 
                                   hour: '2-digit', 
@@ -130,27 +130,27 @@ export default function PendingPayments() {
                                 })}
                               </div>
                             </td>
-                            <td className="p-4 text-right font-semibold">
+                            <td className="p-3 text-sm font-semibold">
                               ₹{sale.total.toLocaleString('en-IN')}
                             </td>
-                            <td className="p-4 text-right">
+                            <td className="p-3 text-sm">
                               <span className={daysOverdue > 30 ? 'text-danger font-semibold' : ''}>
                                 {daysOverdue} days
                               </span>
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="p-3 text-center">
                               <Badge variant={sale.status === 'unpaid' ? 'destructive' : 'secondary'}>
                                 {sale.status}
                               </Badge>
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="p-3 text-center">
                               <div className="flex items-center justify-center gap-2">
                                 <Button size="sm" onClick={() => navigate('/payments/receive')}>
                                   Record Payment
                                 </Button>
                                 <Button
                                   size="sm"
-                                  variant="outline"
+                                  variant="ghost"
                                   onClick={() => handleShareWhatsApp('pending', sale)}
                                   title="Share on WhatsApp"
                                 >
@@ -158,7 +158,7 @@ export default function PendingPayments() {
                                 </Button>
                                 <Button
                                   size="sm"
-                                  variant="outline"
+                                  variant="ghost"
                                   onClick={() => handleShareEmail('pending', sale)}
                                   title="Share via Email"
                                 >
@@ -191,7 +191,7 @@ export default function PendingPayments() {
                         {sale.status}
                       </Badge>
                     </div>
-                    <div className="space-y-2 mb-3">
+                    <div className="space-y-2 mb-3 pt-3 border-t">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Date & Time</span>
                         <div className="text-right">
@@ -217,7 +217,7 @@ export default function PendingPayments() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 pt-3 border-t">
                       <Button className="flex-1" size="sm" onClick={() => navigate('/payments/receive')}>
                         Record Payment
                       </Button>
@@ -246,8 +246,8 @@ export default function PendingPayments() {
                 <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <DollarSign className="w-8 h-8 text-success" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">All Caught Up!</h3>
-                <p className="text-muted-foreground">No pending payments at the moment.</p>
+                <h3 className="text-md font-bold mb-2">All Caught Up!</h3>
+                <p className="text-sm text-muted-foreground">No pending payments at the moment.</p>
               </Card>
             )}
           </TabsContent>
@@ -257,8 +257,8 @@ export default function PendingPayments() {
               <Card>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b">
-                      <tr className="bg-muted/50">
+                    <thead className="bg-muted/50">
+                      <tr>
                         <th className="text-left p-3 text-xs font-semibold uppercase min-w-[140px]">Date & Time</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Customer</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Amount</th>

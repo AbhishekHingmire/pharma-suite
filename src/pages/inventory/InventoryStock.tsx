@@ -4,13 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, AlertCircle, Package } from 'lucide-react';
+import { Search, AlertCircle, Package, Eye } from 'lucide-react';
 import { getFromStorage } from '@/lib/storage';
 import { InventoryBatch, Product } from '@/types';
+import { InventoryBatchModal } from '@/components/InventoryBatchModal';
+import { cn } from '@/lib/utils';
 
 export default function InventoryStock() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'low' | 'expiring' | 'out'>('all');
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   
   const inventory = getFromStorage<InventoryBatch>('inventory');
   const products = getFromStorage<Product>('products');
@@ -119,18 +123,18 @@ export default function InventoryStock() {
         {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           <Card className="p-2 md:p-3">
-            <h3 className="text-[10px] md:text-xs font-semibold mb-1 truncate">Total Batches</h3>
-            <p className="text-base md:text-xl font-bold">{inventory.length}</p>
+            <h3 className="text-xs font-semibold mb-1 truncate">Total Batches</h3>
+            <p className="text-lg font-bold">{inventory.length}</p>
           </Card>
           <Card className="p-2 md:p-3">
-            <h3 className="text-[10px] md:text-xs font-semibold mb-1 truncate">Total Value</h3>
-            <p className="text-base md:text-xl font-bold truncate">
+            <h3 className="text-xs font-semibold mb-1 truncate">Total Value</h3>
+            <p className="text-lg font-bold truncate">
               ₹{inventory.reduce((sum, inv) => sum + (inv.qty * inv.rate), 0).toLocaleString('en-IN')}
             </p>
           </Card>
           <Card className="p-2 md:p-3">
-            <h3 className="text-[10px] md:text-xs font-semibold mb-1 truncate">Oldest Expiry</h3>
-            <p className="text-xs md:text-sm text-danger truncate">
+            <h3 className="text-xs font-semibold mb-1 truncate">Oldest Expiry</h3>
+            <p className="text-sm md:text-md text-danger truncate">
               {inventory.length > 0 && (() => {
                 const sortedByExpiry = [...inventory].sort((a, b) => 
                   new Date(a.expiry).getTime() - new Date(b.expiry).getTime()
@@ -152,37 +156,66 @@ export default function InventoryStock() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4 font-semibold">Product</th>
-                      <th className="text-right p-4 font-semibold">Total Qty</th>
-                      <th className="text-right p-4 font-semibold">Batches</th>
-                      <th className="text-left p-4 font-semibold">Oldest Expiry</th>
-                      <th className="text-right p-4 font-semibold">Stock Value</th>
-                      <th className="text-center p-4 font-semibold">Status</th>
+                      <th className="text-left p-3 text-sm font-semibold uppercase">Product</th>
+                      <th className="text-right p-3 text-sm font-semibold uppercase">Total Qty</th>
+                      <th className="text-right p-3 text-sm font-semibold uppercase">Batches</th>
+                      <th className="text-left p-3 text-sm font-semibold uppercase">Oldest Expiry</th>
+                      <th className="text-right p-3 text-sm font-semibold uppercase">Stock Value</th>
+                      <th className="text-center p-3 text-sm font-semibold uppercase">Status</th>
+                      <th className="text-center p-3 text-sm font-semibold uppercase">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredInventory.map((item) => (
-                      <tr key={item.product.id} className="border-b last:border-0 hover:bg-muted/50">
-                        <td className="p-4">
+                      <tr 
+                        key={item.product.id} 
+                        className="border-b last:border-0 hover:bg-muted/30"
+                      >
+                        <td className="p-3">
                           <div>
-                            <p className="font-medium">{item.product.name}</p>
+                            <p className={cn(
+                              "text-sm font-medium",
+                              item.totalQty === 0 && "text-danger"
+                            )}>{item.product.name}</p>
                             <p className="text-sm text-muted-foreground">{item.product.generic}</p>
                           </div>
                         </td>
-                        <td className="p-4 text-right font-semibold">{item.totalQty}</td>
-                        <td className="p-4 text-right">{item.batches}</td>
-                        <td className="p-4">
-                          {item.oldestExpiry ? new Date(item.oldestExpiry).toLocaleDateString() : '-'}
-                        </td>
-                        <td className="p-4 text-right font-semibold">
-                          ₹{item.stockValue.toLocaleString('en-IN')}
-                        </td>
-                        <td className="p-4">
-                          <div className="flex items-center justify-center gap-2">
-                            {getStatusDot(item.status)}
-                            <span className="text-sm capitalize">{item.status}</span>
-                          </div>
-                        </td>
+                        {item.totalQty > 0 ? (
+                          <>
+                            <td className="p-3 text-sm text-right font-semibold">{item.totalQty}</td>
+                            <td className="p-3 text-sm text-right">{item.batches}</td>
+                            <td className="p-3 text-sm">
+                              {item.oldestExpiry ? new Date(item.oldestExpiry).toLocaleDateString() : '-'}
+                            </td>
+                            <td className="p-3 text-sm text-right font-semibold">
+                              ₹{item.stockValue.toLocaleString('en-IN')}
+                            </td>
+                            <td className="p-3">
+                              <div className="flex items-center justify-center gap-2">
+                                {getStatusDot(item.status)}
+                                <span className="text-sm capitalize">{item.status}</span>
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              <div className="flex items-center justify-center">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  onClick={() => {
+                                    setSelectedProductId(item.product.id);
+                                    setModalOpen(true);
+                                  }}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          <td colSpan={6} className="p-3 text-center text-sm text-muted-foreground">
+                            Out of Stock
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -194,35 +227,59 @@ export default function InventoryStock() {
           {/* Mobile Cards */}
           <div className="lg:hidden space-y-3">
             {filteredInventory.map((item) => (
-              <Card key={item.product.id} className="p-4">
+              <Card 
+                key={item.product.id} 
+                className="p-4"
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <p className="font-semibold">{item.product.name}</p>
+                    <p className={cn(
+                      "font-semibold",
+                      item.totalQty === 0 && "text-danger"
+                    )}>{item.product.name}</p>
                     <p className="text-sm text-muted-foreground">{item.product.generic}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {getStatusDot(item.status)}
-                    <Badge variant={item.totalQty > item.product.minStock ? 'default' : 'destructive'}>
-                      {item.totalQty}
-                    </Badge>
+                    {item.totalQty > 0 && (
+                      <>
+                        {getStatusDot(item.status)}
+                        <Badge variant={item.totalQty > item.product.minStock ? 'default' : 'destructive'}>
+                          {item.totalQty}
+                        </Badge>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => {
+                            setSelectedProductId(item.product.id);
+                            setModalOpen(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <div>
-                    <p className="text-[10px] text-muted-foreground truncate">Batches</p>
-                    <p className="font-medium text-sm">{item.batches}</p>
+                {item.totalQty > 0 ? (
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground truncate">Batches</p>
+                      <p className="font-medium text-sm">{item.batches}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground truncate">Value</p>
+                      <p className="font-medium text-sm truncate">₹{item.stockValue.toLocaleString('en-IN')}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground truncate">Oldest Expiry</p>
+                      <p className="font-medium text-sm truncate">
+                        {item.oldestExpiry ? new Date(item.oldestExpiry).toLocaleDateString('en-IN', { month: '2-digit', day: '2-digit', year: 'numeric' }) : '-'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground truncate">Value</p>
-                    <p className="font-medium text-sm truncate">₹{item.stockValue.toLocaleString('en-IN')}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground truncate">Oldest Expiry</p>
-                    <p className="font-medium text-sm truncate">
-                      {item.oldestExpiry ? new Date(item.oldestExpiry).toLocaleDateString('en-IN', { month: '2-digit', day: '2-digit', year: 'numeric' }) : '-'}
-                    </p>
-                  </div>
-                </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-2">Out of Stock</p>
+                )}
               </Card>
             ))}
           </div>
@@ -235,6 +292,13 @@ export default function InventoryStock() {
           )}
         </div>
       </div>
+
+      {/* Batch Details Modal */}
+      <InventoryBatchModal 
+        productId={selectedProductId}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </DashboardLayout>
   );
 }

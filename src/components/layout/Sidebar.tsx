@@ -19,7 +19,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     { to: '/inventory', icon: Package, label: 'Inventory', roles: ['admin', 'staff'] },
     { to: '/payments', icon: CreditCard, label: 'Payments', roles: ['admin'] },
     { to: '/reports', icon: FileText, label: 'Reports', roles: ['admin'] },
-    { to: '/masters', icon: FolderTree, label: 'Management', roles: ['admin'] },
+    { to: '/masters', icon: FolderTree, label: 'Masters', roles: ['admin'] },
     { to: '/settings', icon: Settings, label: 'Settings', roles: ['admin'] },
   ];
 

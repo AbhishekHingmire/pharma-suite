@@ -194,7 +194,7 @@ export default function EditPurchase() {
     <DashboardLayout title="Edit Purchase">
       <div className="max-w-4xl mx-auto space-y-6">
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Purchase Information</h2>
+          <h2 className="text-lg font-bold mb-4">Purchase Information</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -243,8 +243,8 @@ export default function EditPurchase() {
         </Card>
 
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Products</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-bold">Products</h2>
             <Button onClick={addItem} variant="outline" size="sm">
               Add Product
             </Button>
@@ -369,18 +369,18 @@ export default function EditPurchase() {
         </Card>
 
         {items.length > 0 && (
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Summary</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
+          <Card className="p-6 sticky top-4">
+            <h3 className="text-md font-bold mb-4">Summary</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
                 <span>Subtotal:</span>
-                <span className="font-semibold">₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold">₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-sm">
                 <span>GST (12%):</span>
-                <span className="font-semibold">₹{gst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <span className="font-bold">₹{gst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
-              <div className="flex justify-between text-lg font-bold pt-2 border-t">
+              <div className="flex justify-between text-md font-bold pt-2 border-t">
                 <span>Total Amount:</span>
                 <span>₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>

@@ -92,7 +92,7 @@ export default function ReceivePayment() {
         </Link>
       </div>
       <Card className="max-w-2xl mx-auto p-6">
-        <h2 className="text-xl font-semibold mb-6">Record Payment</h2>
+        <h2 className="text-lg font-bold mb-6">Record Payment</h2>
 
         <div className="space-y-6">
           <div className="space-y-2">
@@ -120,7 +120,7 @@ export default function ReceivePayment() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Outstanding Amount</p>
-                  <p className="text-2xl font-bold text-danger">
+                  <p className="text-lg font-bold text-danger">
                     ₹{selectedCustomer.outstanding.toLocaleString('en-IN')}
                   </p>
                 </div>

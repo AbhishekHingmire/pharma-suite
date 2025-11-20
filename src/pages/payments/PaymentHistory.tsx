@@ -43,7 +43,7 @@ export default function PaymentHistory() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xl font-semibold">Payment History</h2>
+            <h2 className="text-lg font-bold">Payment History</h2>
             <p className="text-sm text-muted-foreground">
               Total Collected: ₹{totalCollected.toLocaleString('en-IN')}
             </p>
@@ -70,8 +70,8 @@ export default function PaymentHistory() {
               <Card>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b">
-                      <tr className="bg-muted/50">
+                    <thead className="bg-muted/50">
+                      <tr>
                         <th className="text-left p-3 text-xs font-semibold uppercase min-w-[140px]">Date & Time</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Customer</th>
                         <th className="text-left p-3 text-xs font-semibold uppercase">Amount</th>

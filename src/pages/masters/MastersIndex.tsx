@@ -67,7 +67,7 @@ export default function MastersIndex() {
     <DashboardLayout title="Masters">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Master Data Management</h2>
+          <h2 className="text-lg font-bold mb-2">Master Data Management</h2>
           <p className="text-muted-foreground">
             Configure and manage your core business data
           </p>
