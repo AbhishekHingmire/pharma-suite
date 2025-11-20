@@ -1,11 +1,11 @@
 import { Company, Product, Customer, Scheme, RateMaster, Purchase, Sale, InventoryBatch, Payment } from '@/types';
 
 export const demoCompanies: Company[] = [
-  { id: 1, name: "Sun Pharma", logo: "https://via.placeholder.com/80?text=SP", contact: "9876543210", paymentTerms: "30 days", status: 'active' },
-  { id: 2, name: "Cipla", logo: "https://via.placeholder.com/80?text=CIP", contact: "9876543211", paymentTerms: "15 days", status: 'active' },
-  { id: 3, name: "Dr Reddy's", logo: "https://via.placeholder.com/80?text=DRL", contact: "9876543212", paymentTerms: "30 days", status: 'active' },
-  { id: 4, name: "Lupin", logo: "https://via.placeholder.com/80?text=LUP", contact: "9876543213", paymentTerms: "COD", status: 'active' },
-  { id: 5, name: "Mankind", logo: "https://via.placeholder.com/80?text=MAN", contact: "9876543214", paymentTerms: "30 days", status: 'active' }
+  { id: 1, name: "Sun Pharma", logo: "https://ui-avatars.com/api/?name=Sun+Pharma&background=14B8A6&color=fff&size=80&bold=true", contact: "9876543210", paymentTerms: "30 days", status: 'active' },
+  { id: 2, name: "Cipla", logo: "https://ui-avatars.com/api/?name=Cipla&background=3B82F6&color=fff&size=80&bold=true", contact: "9876543211", paymentTerms: "15 days", status: 'active' },
+  { id: 3, name: "Dr Reddy's", logo: "https://ui-avatars.com/api/?name=Dr+Reddys&background=10B981&color=fff&size=80&bold=true", contact: "9876543212", paymentTerms: "30 days", status: 'active' },
+  { id: 4, name: "Lupin", logo: "https://ui-avatars.com/api/?name=Lupin&background=F59E0B&color=fff&size=80&bold=true", contact: "9876543213", paymentTerms: "COD", status: 'active' },
+  { id: 5, name: "Mankind", logo: "https://ui-avatars.com/api/?name=Mankind&background=EF4444&color=fff&size=80&bold=true", contact: "9876543214", paymentTerms: "30 days", status: 'active' }
 ];
 
 export const demoProducts: Product[] = [

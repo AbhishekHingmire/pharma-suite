@@ -47,55 +47,55 @@ export default function Dashboard() {
     <DashboardLayout title="Dashboard">
       <div className="space-y-6">
         {/* Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Today's Sales</p>
-                <p className="text-2xl font-bold">₹{todaySales.toLocaleString('en-IN')}</p>
-                <div className="flex items-center gap-1 mt-2">
-                  <TrendingUp className="w-4 h-4 text-success" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <Card className="p-3 md:p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Today's Sales</p>
+                <p className="text-lg md:text-2xl font-bold truncate">₹{todaySales.toLocaleString('en-IN')}</p>
+                <div className="flex items-center gap-1 mt-1 md:mt-2">
+                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-success flex-shrink-0" />
                   <span className="text-xs text-success font-medium">+12%</span>
                 </div>
               </div>
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Receipt className="w-5 h-5 text-primary" />
+              <div className="p-1.5 md:p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                <Receipt className="w-4 h-4 md:w-5 md:h-5 text-primary" />
               </div>
             </div>
           </Card>
 
-          <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Purchases</p>
-                <p className="text-2xl font-bold">₹{totalPurchases.toLocaleString('en-IN')}</p>
+          <Card className="p-3 md:p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Purchases</p>
+                <p className="text-lg md:text-2xl font-bold truncate">₹{totalPurchases.toLocaleString('en-IN')}</p>
               </div>
-              <div className="p-2 bg-secondary/10 rounded-lg">
-                <ShoppingCart className="w-5 h-5 text-secondary" />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Outstanding</p>
-                <p className="text-2xl font-bold text-danger">₹{totalOutstanding.toLocaleString('en-IN')}</p>
-              </div>
-              <div className="p-2 bg-danger/10 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-danger" />
+              <div className="p-1.5 md:p-2 bg-secondary/10 rounded-lg flex-shrink-0">
+                <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 text-secondary" />
               </div>
             </div>
           </Card>
 
-          <Card className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Stock Value</p>
-                <p className="text-2xl font-bold">₹{stockValue.toLocaleString('en-IN')}</p>
+          <Card className="p-3 md:p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Outstanding</p>
+                <p className="text-lg md:text-2xl font-bold text-danger truncate">₹{totalOutstanding.toLocaleString('en-IN')}</p>
               </div>
-              <div className="p-2 bg-info/10 rounded-lg">
-                <Package className="w-5 h-5 text-info" />
+              <div className="p-1.5 md:p-2 bg-danger/10 rounded-lg flex-shrink-0">
+                <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-danger" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-3 md:p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Stock Value</p>
+                <p className="text-lg md:text-2xl font-bold truncate">₹{stockValue.toLocaleString('en-IN')}</p>
+              </div>
+              <div className="p-1.5 md:p-2 bg-info/10 rounded-lg flex-shrink-0">
+                <Package className="w-4 h-4 md:w-5 md:h-5 text-info" />
               </div>
             </div>
           </Card>
