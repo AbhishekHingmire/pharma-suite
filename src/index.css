@@ -107,23 +107,52 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-sm;
+    line-height: 1.4;
   }
 
   h1 {
-    @apply text-3xl md:text-4xl font-bold;
+    @apply text-xl md:text-2xl font-bold;
+    line-height: 1.2;
   }
 
   h2 {
-    @apply text-xl md:text-2xl font-semibold;
+    @apply text-lg md:text-xl font-semibold;
+    line-height: 1.2;
   }
 
   h3 {
-    @apply text-lg md:text-xl font-semibold;
+    @apply text-base md:text-lg font-semibold;
+    line-height: 1.2;
   }
 
   h4 {
-    @apply text-base md:text-lg font-semibold;
+    @apply text-sm md:text-base font-semibold;
+    line-height: 1.2;
+  }
+
+  label {
+    @apply text-[13px];
+  }
+
+  button {
+    @apply text-sm;
+  }
+
+  input, select, textarea {
+    @apply text-sm;
+  }
+
+  input::placeholder, select::placeholder, textarea::placeholder {
+    @apply text-[13px] text-muted-foreground;
+  }
+
+  table thead th {
+    @apply text-xs uppercase font-semibold;
+  }
+
+  table tbody td {
+    @apply text-[13px];
   }
 }
 

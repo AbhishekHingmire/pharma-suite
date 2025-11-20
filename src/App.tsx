@@ -16,6 +16,8 @@ import InventoryStock from "./pages/inventory/InventoryStock";
 import ReceivePayment from "./pages/payments/ReceivePayment";
 import PendingPayments from "./pages/payments/PendingPayments";
 import MastersIndex from "./pages/masters/MastersIndex";
+import RateMaster from "./pages/masters/RateMaster";
+import Users from "./pages/masters/Users";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -88,6 +90,16 @@ function AppRoutes() {
       <Route path="/masters" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <MastersIndex />
+        </ProtectedRoute>
+      } />
+      <Route path="/masters/rate-master" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <RateMaster />
+        </ProtectedRoute>
+      } />
+      <Route path="/masters/users" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Users />
         </ProtectedRoute>
       } />
       <Route path="/masters/*" element={

@@ -2,6 +2,7 @@ import { useState, ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -18,7 +19,8 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
       <div className="lg:pl-60 pb-16 lg:pb-0">
         <TopBar onMenuClick={() => setSidebarOpen(true)} title={title} />
         
-        <main className="p-4 lg:p-6">
+        <main className="p-3 lg:p-6">
+          <Breadcrumbs />
           {children}
         </main>
       </div>
