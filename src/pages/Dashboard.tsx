@@ -147,10 +147,10 @@ export default function Dashboard() {
                     <Button 
                       variant="link" 
                       size="sm" 
-                      className="w-full sm:w-auto flex-shrink-0 text-xs md:text-sm h-auto py-1" 
+                      className="flex-shrink-0 text-xs md:text-sm h-auto py-1" 
                       onClick={() => navigate('/inventory/stock')}
                     >
-                      View Details
+                      View
                     </Button>
                   </div>
                 </Card>
@@ -171,10 +171,10 @@ export default function Dashboard() {
                     <Button 
                       variant="link" 
                       size="sm" 
-                      className="w-full sm:w-auto flex-shrink-0 text-xs md:text-sm h-auto py-1" 
+                      className="flex-shrink-0 text-xs md:text-sm h-auto py-1" 
                       onClick={() => navigate('/inventory/stock')}
                     >
-                      View Details
+                      View
                     </Button>
                   </div>
                 </Card>
