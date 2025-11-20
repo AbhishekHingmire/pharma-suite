@@ -1,30 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { CalendarIcon, Plus, X, AlertCircle } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getFromStorage, saveToStorage, getNextId } from '@/lib/storage';
-import { Company, Product, Scheme, PurchaseItem, InventoryBatch } from '@/types';
+import { getFromStorage, saveToStorage } from '@/lib/storage';
+import { Company, Product, Scheme, PurchaseItem, Purchase, InventoryBatch } from '@/types';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-export default function NewPurchase() {
+export default function EditPurchase() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  const { id } = useParams<{ id: string }>();
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [items, setItems] = useState<PurchaseItem[]>([]);
   const [schemeVerified, setSchemeVerified] = useState<boolean[]>([]);
+  const [originalPurchase, setOriginalPurchase] = useState<Purchase | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const companies = getFromStorage<Company>('companies');
   const products = getFromStorage<Product>('products');
   const schemes = getFromStorage<Scheme>('schemes');
+
+  useEffect(() => {
+    // Load existing purchase data
+    const purchases = getFromStorage<Purchase>('purchases');
+    const purchase = purchases.find(p => p.id === parseInt(id || '0'));
+    
+    if (!purchase) {
+      toast.error('Purchase not found');
+      navigate('/purchase');
+      return;
+    }
+
+    setOriginalPurchase(purchase);
+    const company = companies.find(c => c.id === purchase.companyId);
+    setSelectedCompany(company || null);
+    setItems(purchase.items);
+    setSchemeVerified(purchase.items.map(() => true));
+    setLoading(false);
+  }, [id]);
 
   const addItem = () => {
     setItems([...items, {
@@ -48,25 +66,36 @@ export default function NewPurchase() {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
 
-    // Calculate amount
-    if (field === 'qty' || field === 'rate') {
-      newItems[index].amount = newItems[index].qty * newItems[index].rate;
-    }
-
-    // Check for schemes
-    if (field === 'productId' || field === 'qty') {
-      const scheme = schemes.find(s => 
-        s.companyId === selectedCompany?.id &&
-        s.status === 'active' &&
-        (s.products === 'all' || (Array.isArray(s.products) && s.products.includes(newItems[index].productId)))
-      );
-
-      if (scheme && scheme.type === 'freeQty' && newItems[index].qty >= (scheme.buyQty || 0)) {
-        newItems[index].freeQty = scheme.freeQty || 0;
-      }
+    if (field === 'qty' || field === 'rate' || field === 'freeQty') {
+      const qty = field === 'qty' ? value : newItems[index].qty;
+      const rate = field === 'rate' ? value : newItems[index].rate;
+      newItems[index].amount = qty * rate;
     }
 
     setItems(newItems);
+  };
+
+  const hasActiveScheme = (itemIndex: number) => {
+    const item = items[itemIndex];
+    if (!item.productId || !selectedCompany) return false;
+
+    const today = new Date().toISOString().split('T')[0];
+    const activeSchemes = schemes.filter(s => 
+      s.companyId === selectedCompany.id &&
+      s.status === 'active' &&
+      s.validFrom <= today &&
+      s.validTo >= today &&
+      (s.products === 'all' || (Array.isArray(s.products) && s.products.includes(item.productId)))
+    );
+
+    return activeSchemes.length > 0;
+  };
+
+  const verifyScheme = (itemIndex: number) => {
+    const item = items[itemIndex];
+    const newVerified = [...schemeVerified];
+    newVerified[itemIndex] = true;
+    setSchemeVerified(newVerified);
   };
 
   const calculateTotals = () => {
@@ -76,12 +105,8 @@ export default function NewPurchase() {
     return { subtotal, gst, total };
   };
 
-  const hasActiveScheme = (index: number) => {
-    return items[index].freeQty > 0;
-  };
-
   const canSave = () => {
-    if (items.length === 0) return false;
+    if (!selectedCompany || items.length === 0 || !originalPurchase) return false;
     
     return items.every((item, idx) => {
       const basicValid = item.productId && item.qty > 0 && item.batch && item.expiry && item.rate > 0;
@@ -91,29 +116,35 @@ export default function NewPurchase() {
   };
 
   const handleSave = () => {
-    if (!selectedCompany) return;
+    if (!selectedCompany || !originalPurchase) return;
 
-    const purchases = getFromStorage('purchases');
+    const purchases = getFromStorage<Purchase>('purchases');
     const { subtotal, gst, total } = calculateTotals();
     
-    const newPurchase = {
-      id: getNextId('purchases'),
+    const updatedPurchase: Purchase = {
+      ...originalPurchase,
       companyId: selectedCompany.id,
-      invoiceNo: `SP/${new Date().getFullYear()}/${String(purchases.length + 1).padStart(3, '0')}`,
-      date: new Date().toISOString().split('T')[0],
       items,
       subtotal,
       gst,
       total,
-      paymentStatus: 'pending' as const,
-      inventoryPhotos: [],
-      createdAt: new Date().toISOString(),
+      lastEditedAt: new Date().toISOString(),
     };
 
-    saveToStorage('purchases', [...purchases, newPurchase]);
-
-    // Update inventory
+    // Update inventory - reverse old items and add new items
     const inventory = getFromStorage<InventoryBatch>('inventory');
+    
+    // Remove old inventory entries
+    originalPurchase.items.forEach(oldItem => {
+      const existingBatch = inventory.find(inv => 
+        inv.productId === oldItem.productId && inv.batch === oldItem.batch
+      );
+      if (existingBatch) {
+        existingBatch.qty -= (oldItem.qty + oldItem.freeQty);
+      }
+    });
+
+    // Add new inventory entries
     items.forEach(item => {
       const existingBatch = inventory.find(inv => 
         inv.productId === item.productId && inv.batch === item.batch
@@ -126,53 +157,32 @@ export default function NewPurchase() {
           productId: item.productId,
           batch: item.batch,
           qty: item.qty + item.freeQty,
-          purchaseDate: new Date().toISOString().split('T')[0],
+          purchaseDate: originalPurchase.date,
           expiry: item.expiry,
           rate: item.rate,
         });
       }
     });
-    saveToStorage('inventory', inventory);
 
-    toast.success('Purchase saved successfully!');
+    // Filter out zero quantity entries
+    const cleanInventory = inventory.filter(inv => inv.qty > 0);
+    saveToStorage('inventory', cleanInventory);
+
+    // Update purchase
+    const updatedPurchases = purchases.map(p => 
+      p.id === originalPurchase.id ? updatedPurchase : p
+    );
+    saveToStorage('purchases', updatedPurchases);
+
+    toast.success('Purchase updated successfully!');
     navigate('/purchase');
   };
 
-  if (step === 1) {
+  if (loading) {
     return (
-      <DashboardLayout title="New Purchase">
-        <Card className="max-w-2xl mx-auto p-6">
-          <h2 className="text-xl font-semibold mb-6">Step 1: Select Company</h2>
-          
-          <div className="space-y-4">
-            {companies.map((company) => (
-              <Card
-                key={company.id}
-                className={cn(
-                  "p-4 cursor-pointer transition-all hover:shadow-md",
-                  selectedCompany?.id === company.id && "border-primary border-2"
-                )}
-                onClick={() => setSelectedCompany(company)}
-              >
-                <div className="flex items-center gap-4">
-                  <img src={company.logo} alt={company.name} className="w-12 h-12 rounded" />
-                  <div className="flex-1">
-                    <p className="font-semibold">{company.name}</p>
-                    <p className="text-sm text-muted-foreground">{company.contact}</p>
-                    <p className="text-sm text-muted-foreground">Payment: {company.paymentTerms}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          <Button
-            className="w-full mt-6"
-            disabled={!selectedCompany}
-            onClick={() => setStep(2)}
-          >
-            Continue
-          </Button>
+      <DashboardLayout title="Edit Purchase">
+        <Card className="max-w-4xl mx-auto p-6">
+          <p className="text-center">Loading...</p>
         </Card>
       </DashboardLayout>
     );
@@ -181,25 +191,61 @@ export default function NewPurchase() {
   const { subtotal, gst, total } = calculateTotals();
 
   return (
-    <DashboardLayout title="New Purchase">
+    <DashboardLayout title="Edit Purchase">
       <div className="max-w-4xl mx-auto space-y-6">
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Selected Company</p>
-              <p className="font-semibold">{selectedCompany?.name}</p>
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Purchase Information</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Company</Label>
+              <Select
+                value={selectedCompany?.id.toString()}
+                onValueChange={(value) => {
+                  const company = companies.find(c => c.id === parseInt(value));
+                  setSelectedCompany(company || null);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select company" />
+                </SelectTrigger>
+                <SelectContent>
+                  {companies.map((company) => (
+                    <SelectItem key={company.id} value={company.id.toString()}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setStep(1)}>
-              Change
-            </Button>
+
+            <div className="space-y-2">
+              <Label>Invoice Number</Label>
+              <Input value={originalPurchase?.invoiceNo} disabled className="bg-muted" />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Purchase Date</Label>
+              <Input value={originalPurchase?.date} disabled className="bg-muted" />
+            </div>
+
+            {originalPurchase?.lastEditedAt && (
+              <div className="space-y-2">
+                <Label>Last Edited</Label>
+                <Input 
+                  value={new Date(originalPurchase.lastEditedAt).toLocaleString('en-IN')} 
+                  disabled 
+                  className="bg-muted text-xs" 
+                />
+              </div>
+            )}
           </div>
         </Card>
 
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Add Products</h2>
-            <Button onClick={addItem} size="sm">
-              <Plus className="w-4 h-4 mr-2" />
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Products</h2>
+            <Button onClick={addItem} variant="outline" size="sm">
               Add Product
             </Button>
           </div>
@@ -254,7 +300,7 @@ export default function NewPurchase() {
                       type="number"
                       value={item.freeQty || ''}
                       onChange={(e) => updateItem(index, 'freeQty', parseInt(e.target.value) || 0)}
-                      className="bg-muted"
+                      className={hasActiveScheme(index) ? 'bg-muted' : ''}
                       readOnly={hasActiveScheme(index)}
                     />
                   </div>
@@ -288,57 +334,37 @@ export default function NewPurchase() {
                     />
                   </div>
 
-                  <div className="space-y-2 md:col-span-2">
+                  <div className="space-y-2">
                     <Label>Amount</Label>
                     <Input
                       value={`₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                      disabled
                       className="bg-muted font-semibold"
-                      readOnly
                     />
                   </div>
                 </div>
 
-                {hasActiveScheme(index) && (
-                  <Card className="p-4 bg-primary/5 border-primary">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-primary mt-0.5" />
-                      <div className="flex-1">
-                        <p className="font-semibold text-primary">Active Scheme Applied</p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Buy {schemes.find(s => s.companyId === selectedCompany?.id)?.buyQty} Get {item.freeQty} Free
-                        </p>
-                        <div className="flex items-center gap-2 mt-3">
-                          <input
-                            type="checkbox"
-                            id={`scheme-${index}`}
-                            checked={schemeVerified[index]}
-                            onChange={(e) => {
-                              const newVerified = [...schemeVerified];
-                              newVerified[index] = e.target.checked;
-                              setSchemeVerified(newVerified);
-                            }}
-                            className="w-4 h-4"
-                          />
-                          <label htmlFor={`scheme-${index}`} className="text-sm">
-                            Free quantity received and verified
-                          </label>
-                        </div>
-                      </div>
+                {hasActiveScheme(index) && !schemeVerified[index] && (
+                  <div className="flex items-start gap-2 p-3 bg-warning/10 rounded-lg">
+                    <AlertCircle className="w-5 h-5 text-warning mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-warning">Scheme Available</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        This product has an active scheme. Please verify the free quantity.
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-2"
+                        onClick={() => verifyScheme(index)}
+                      >
+                        Verify Scheme
+                      </Button>
                     </div>
-                  </Card>
+                  </div>
                 )}
               </div>
             ))}
-
-            {items.length === 0 && (
-              <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                <p className="text-muted-foreground mb-4">No products added yet</p>
-                <Button onClick={addItem}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add First Product
-                </Button>
-              </div>
-            )}
           </div>
         </Card>
 
@@ -367,7 +393,7 @@ export default function NewPurchase() {
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={!canSave()} className="flex-1">
-            Save Purchase
+            Update Purchase
           </Button>
         </div>
       </div>

@@ -100,7 +100,11 @@ export default function PurchaseList() {
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              <Button variant="ghost" size="icon">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => navigate(`/purchase/edit/${purchase.id}`)}
+                              >
                                 <Edit className="w-4 h-4" />
                               </Button>
                               <Button variant="ghost" size="icon">
@@ -149,7 +153,11 @@ export default function PurchaseList() {
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => navigate(`/purchase/edit/${purchase.id}`)}
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
                     </div>
