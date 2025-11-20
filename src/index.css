@@ -112,22 +112,22 @@ All colors MUST be HSL.
   }
 
   h1 {
-    @apply text-xl md:text-2xl font-bold;
+    @apply text-lg md:text-2xl font-bold;
     line-height: 1.2;
   }
 
   h2 {
-    @apply text-lg md:text-xl font-semibold;
+    @apply text-base md:text-xl font-semibold;
     line-height: 1.2;
   }
 
   h3 {
-    @apply text-base md:text-lg font-semibold;
+    @apply text-sm md:text-lg font-semibold;
     line-height: 1.2;
   }
 
   h4 {
-    @apply text-sm md:text-base font-semibold;
+    @apply text-xs md:text-base font-semibold;
     line-height: 1.2;
   }
 
