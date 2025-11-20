@@ -2,7 +2,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, ShoppingCart, Receipt, AlertCircle, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getFromStorage } from '@/lib/storage';
+import { getFromStorage, formatAmount, formatCompactAmount } from '@/lib/storage';
 import { Sale, Purchase, InventoryBatch, Product } from '@/types';
 import { useNavigate } from 'react-router-dom';
 
@@ -54,7 +54,13 @@ export default function Dashboard() {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Today's Sales</p>
-                <p className="text-lg md:text-2xl font-bold truncate">₹{todaySales.toLocaleString('en-IN')}</p>
+                <p 
+                  className="text-lg md:text-2xl font-bold truncate" 
+                  title={formatAmount(todaySales)}
+                >
+                  <span className="md:hidden">{formatCompactAmount(todaySales)}</span>
+                  <span className="hidden md:inline">{formatAmount(todaySales)}</span>
+                </p>
                 <div className="flex items-center gap-1 mt-1 md:mt-2">
                   <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-success flex-shrink-0" />
                   <span className="text-xs text-success font-medium">+12%</span>
@@ -70,7 +76,13 @@ export default function Dashboard() {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Purchases</p>
-                <p className="text-lg md:text-2xl font-bold truncate">₹{totalPurchases.toLocaleString('en-IN')}</p>
+                <p 
+                  className="text-lg md:text-2xl font-bold truncate"
+                  title={formatAmount(totalPurchases)}
+                >
+                  <span className="md:hidden">{formatCompactAmount(totalPurchases)}</span>
+                  <span className="hidden md:inline">{formatAmount(totalPurchases)}</span>
+                </p>
               </div>
               <div className="p-1.5 md:p-2 bg-secondary/10 rounded-lg flex-shrink-0">
                 <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 text-secondary" />
@@ -82,7 +94,13 @@ export default function Dashboard() {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Outstanding</p>
-                <p className="text-lg md:text-2xl font-bold text-danger truncate">₹{totalOutstanding.toLocaleString('en-IN')}</p>
+                <p 
+                  className="text-lg md:text-2xl font-bold text-danger truncate"
+                  title={formatAmount(totalOutstanding)}
+                >
+                  <span className="md:hidden">{formatCompactAmount(totalOutstanding)}</span>
+                  <span className="hidden md:inline">{formatAmount(totalOutstanding)}</span>
+                </p>
               </div>
               <div className="p-1.5 md:p-2 bg-danger/10 rounded-lg flex-shrink-0">
                 <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-danger" />
@@ -94,7 +112,13 @@ export default function Dashboard() {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Stock Value</p>
-                <p className="text-lg md:text-2xl font-bold truncate">₹{stockValue.toLocaleString('en-IN')}</p>
+                <p 
+                  className="text-lg md:text-2xl font-bold truncate"
+                  title={formatAmount(stockValue)}
+                >
+                  <span className="md:hidden">{formatCompactAmount(stockValue)}</span>
+                  <span className="hidden md:inline">{formatAmount(stockValue)}</span>
+                </p>
               </div>
               <div className="p-1.5 md:p-2 bg-info/10 rounded-lg flex-shrink-0">
                 <Package className="w-4 h-4 md:w-5 md:h-5 text-info" />
@@ -110,10 +134,10 @@ export default function Dashboard() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-danger mt-0.5" />
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="font-semibold text-danger">Products Expiring Soon</p>
-                    <p className="text-sm text-muted-foreground">
-                      {expiringProducts.length} products expiring in 90 days - ₹{expiringValue.toLocaleString('en-IN')} value
+                    <p className="text-sm text-muted-foreground truncate" title={formatAmount(expiringValue)}>
+                      {expiringProducts.length} products expiring in 90 days - {formatCompactAmount(expiringValue)} value
                     </p>
                   </div>
                 </div>
@@ -164,13 +188,15 @@ export default function Dashboard() {
           <h3 className="text-lg font-semibold mb-4">Recent Activities</h3>
           <div className="space-y-3">
             {sales.slice(0, 5).map((sale, idx) => (
-              <div key={idx} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div>
-                  <p className="font-medium">{sale.invoiceNo}</p>
+              <div key={idx} className="flex items-center justify-between gap-3 py-2 border-b last:border-0">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{sale.invoiceNo}</p>
                   <p className="text-sm text-muted-foreground">{new Date(sale.date).toLocaleDateString()}</p>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">₹{sale.total.toLocaleString('en-IN')}</p>
+                <div className="text-right flex-shrink-0">
+                  <p className="font-semibold truncate" title={formatAmount(sale.total)}>
+                    {formatCompactAmount(sale.total)}
+                  </p>
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     sale.status === 'paid' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
                   }`}>

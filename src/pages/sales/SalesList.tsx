@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Search, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getFromStorage } from '@/lib/storage';
+import { getFromStorage, formatAmount, formatCompactAmount } from '@/lib/storage';
 import { Sale, Customer } from '@/types';
 import { SaleDetailModal } from '@/components/SaleDetailModal';
 
@@ -127,8 +127,9 @@ export default function SalesList() {
                           <td className="p-4 font-medium">{sale.invoiceNo}</td>
                           <td className="p-4">{getCustomerName(sale.customerId)}</td>
                           <td className="p-4 text-right">{sale.items.length}</td>
-                          <td className="p-4 text-right font-semibold">
-                            ₹{sale.total.toLocaleString('en-IN')}
+                          <td className="p-4 text-right font-semibold truncate max-w-[150px]" title={formatAmount(sale.total)}>
+                            <span className="md:hidden">{formatCompactAmount(sale.total)}</span>
+                            <span className="hidden md:inline">{formatAmount(sale.total)}</span>
                           </td>
                           <td className="p-4 text-center">
                             {getStatusBadge(sale.status)}
@@ -174,13 +175,16 @@ export default function SalesList() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-sm text-muted-foreground">{sale.items.length} products</p>
-                      <p className="text-lg font-bold">₹{sale.total.toLocaleString('en-IN')}</p>
+                      <p className="text-lg font-bold truncate" title={formatAmount(sale.total)}>
+                        {formatCompactAmount(sale.total)}
+                      </p>
                     </div>
                     <Button 
                       variant="ghost" 
                       size="icon"
+                      className="flex-shrink-0"
                       onClick={() => {
                         setSelectedSale(sale);
                         setIsModalOpen(true);
