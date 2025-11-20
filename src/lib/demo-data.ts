@@ -58,7 +58,10 @@ export const demoPurchases: Purchase[] = [
     ],
     subtotal: 9090,
     gst: 1090.80,
-    total: 10180.80
+    total: 10180.80,
+    paymentStatus: 'paid',
+    paidAmount: 10180.80,
+    inventoryPhotos: []
   },
   {
     id: 2,
@@ -70,7 +73,9 @@ export const demoPurchases: Purchase[] = [
     ],
     subtotal: 16500,
     gst: 1980,
-    total: 18480
+    total: 18480,
+    paymentStatus: 'pending',
+    inventoryPhotos: []
   }
 ];
 

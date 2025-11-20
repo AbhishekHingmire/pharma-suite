@@ -89,7 +89,14 @@ export default function PurchaseList() {
                           </td>
                           <td className="p-4">
                             <div className="flex items-center justify-center gap-2">
-                              <Button variant="ghost" size="icon">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedPurchase(purchase);
+                                  setIsModalOpen(true);
+                                }}
+                              >
                                 <Eye className="w-4 h-4" />
                               </Button>
                               <Button variant="ghost" size="icon">
@@ -129,7 +136,14 @@ export default function PurchaseList() {
                       <p className="text-lg font-bold">₹{purchase.total.toLocaleString('en-IN')}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => {
+                          setSelectedPurchase(purchase);
+                          setIsModalOpen(true);
+                        }}
+                      >
                         <Eye className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="icon">

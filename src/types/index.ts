@@ -65,6 +65,11 @@ export interface Purchase {
   subtotal: number;
   gst: number;
   total: number;
+  paymentStatus: 'paid' | 'pending' | 'partial';
+  paidAmount?: number;
+  transactionId?: string;
+  paymentProof?: string[];
+  inventoryPhotos: string[];
 }
 
 export interface SalesItem {

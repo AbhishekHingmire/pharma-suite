@@ -100,11 +100,11 @@ export default function Reports() {
                 onChange={(e) => setDateTo(e.target.value)}
               />
             </div>
-            <div className="flex items-end gap-2">
-              <Button onClick={() => { setDateFrom(''); setDateTo(''); }}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
+              <Button onClick={() => { setDateFrom(''); setDateTo(''); }} className="w-full sm:w-auto">
                 Clear Filters
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Download className="w-4 h-4 mr-2" />
                 Export PDF
               </Button>
