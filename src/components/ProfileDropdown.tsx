@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
+import { User, Settings, HelpCircle, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -32,6 +32,14 @@ export function ProfileDropdown() {
     {
       icon: User,
       label: 'My Profile',
+      onClick: () => {
+        navigate('/profile');
+        setIsOpen(false);
+      }
+    },
+    {
+      icon: Settings,
+      label: 'Settings',
       onClick: () => {
         navigate('/settings');
         setIsOpen(false);

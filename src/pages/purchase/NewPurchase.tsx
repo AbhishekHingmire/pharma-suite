@@ -10,8 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { CalendarIcon, Plus, X, AlertCircle, Gift, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getFromStorage, saveToStorage, getNextId } from '@/lib/storage';
-import { Company, Product, Scheme, PurchaseItem, InventoryBatch } from '@/types';
+import { getFromStorage, saveToStorage, getNextId, isBasicHREnabled } from '@/lib/storage';
+import { Company, Product, Scheme, PurchaseItem, InventoryBatch, EmployeeActivity } from '@/types';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
@@ -20,6 +20,7 @@ export default function NewPurchase() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'admin';
+  const hrEnabled = isBasicHREnabled(); // Always true for activity tracking
   const [step, setStep] = useState(1);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [items, setItems] = useState<PurchaseItem[]>([]);
@@ -305,6 +306,7 @@ export default function NewPurchase() {
       transactionId: paymentStatus !== 'pending' ? transactionId : undefined,
       inventoryPhotos: [],
       createdAt: new Date().toISOString(),
+      createdBy: user?.id, // Track who created the purchase
     };
 
     saveToStorage('purchases', [...purchases, newPurchase]);
@@ -332,6 +334,26 @@ export default function NewPurchase() {
       }
     });
     saveToStorage('inventory', inventory);
+
+    // Log activity if HR module is enabled
+    if (hrEnabled && user) {
+      const activities = getFromStorage<EmployeeActivity>('activities');
+      const now = new Date();
+      const newActivity: EmployeeActivity = {
+        id: getNextId('activities'),
+        employeeId: user.id,
+        employeeName: user.name,
+        date: now.toISOString().split('T')[0],
+        timestamp: now.toISOString(),
+        type: 'purchase',
+        title: `Purchase Created - ${newPurchase.invoiceNo}`,
+        description: `Purchase from ${selectedCompany.name} - ₹${total.toLocaleString('en-IN')}`,
+        purchaseId: newPurchase.id,
+        status: 'completed',
+        createdAt: now.toISOString(),
+      };
+      saveToStorage('activities', [...activities, newActivity]);
+    }
 
     toast.success('Purchase saved successfully!');
     navigate('/purchase');

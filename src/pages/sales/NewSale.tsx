@@ -9,14 +9,17 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Plus, X, AlertCircle, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getFromStorage, saveToStorage, getNextId } from '@/lib/storage';
-import { Customer, Product, RateMaster, InventoryBatch, SalesItem, Company } from '@/types';
+import { getFromStorage, saveToStorage, getNextId, isBasicHREnabled } from '@/lib/storage';
+import { Customer, Product, RateMaster, InventoryBatch, SalesItem, Company, EmployeeActivity } from '@/types';
 import { getSuggestedPrice, getAvailableBatches, calculateDaysToExpiry } from '@/lib/pricing';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 
 export default function NewSale() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const hrEnabled = isBasicHREnabled(); // Always true for activity tracking
   const [step, setStep] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [items, setItems] = useState<SalesItem[]>([]);
@@ -128,6 +131,7 @@ export default function NewSale() {
       gst,
       total,
       status: 'unpaid' as const,
+      createdBy: user?.id, // Track who created the sale
     };
 
     saveToStorage('sales', [...sales, newSale]);
@@ -151,6 +155,27 @@ export default function NewSale() {
         : c
     );
     saveToStorage('customers', updatedCustomers);
+
+    // Log activity if HR module is enabled
+    if (hrEnabled && user) {
+      const activities = getFromStorage<EmployeeActivity>('activities');
+      const now = new Date();
+      const newActivity: EmployeeActivity = {
+        id: getNextId('activities'),
+        employeeId: user.id,
+        employeeName: user.name,
+        date: now.toISOString().split('T')[0],
+        timestamp: now.toISOString(),
+        type: 'sale',
+        title: `Sale Created - ${newSale.invoiceNo}`,
+        description: `Invoice for ${selectedCustomer.name} - ₹${total.toLocaleString('en-IN')}`,
+        saleId: newSale.id,
+        customerId: selectedCustomer.id,
+        status: 'completed',
+        createdAt: now.toISOString(),
+      };
+      saveToStorage('activities', [...activities, newActivity]);
+    }
 
     toast.success('Sale saved successfully!');
     navigate('/sales');

@@ -33,3 +33,71 @@ export function formatCompactAmount(amount: number): string {
   }
   return `₹${amount.toLocaleString('en-IN')}`;
 }
+
+// ===== SYSTEM SETTINGS =====
+
+export function getSystemSettings(): any {
+  try {
+    const settings = localStorage.getItem('systemSettings');
+    if (settings) return JSON.parse(settings);
+    
+    // Default settings
+    const defaultSettings = {
+      modules: {
+        inventory: {
+          enabled: true,
+          features: {
+            sales: true,
+            purchase: true,
+            payments: true,
+            reports: true,
+          },
+        },
+        hr: {
+          enabled: true, // Enable by default for demo
+          features: {
+            attendance: true,
+            leave: true,
+            activities: true,
+            performance: true,
+          },
+        },
+      },
+      subscription: {
+        plan: 'professional',
+        hrModuleActive: true,
+        expiryDate: '2026-12-31',
+      },
+    };
+    
+    localStorage.setItem('systemSettings', JSON.stringify(defaultSettings));
+    return defaultSettings;
+  } catch (error) {
+    console.error('Error reading system settings:', error);
+    return null;
+  }
+}
+
+export function saveSystemSettings(settings: any): void {
+  try {
+    localStorage.setItem('systemSettings', JSON.stringify(settings));
+  } catch (error) {
+    console.error('Error saving system settings:', error);
+  }
+}
+
+export function isHRModuleEnabled(): boolean {
+  const settings = getSystemSettings();
+  return settings?.modules?.hr?.enabled ?? false;
+}
+
+// Basic HR features (always available for inventory tracking)
+export function isBasicHREnabled(): boolean {
+  return true; // Always enabled for timeline/activity tracking
+}
+
+// Full HR features (subscription-based: attendance, leave, full workforce management)
+export function isFullHREnabled(): boolean {
+  const settings = getSystemSettings();
+  return settings?.subscription?.hrModuleActive ?? false;
+}

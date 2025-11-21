@@ -17,6 +17,32 @@ export function Breadcrumbs() {
     return null;
   }
 
+  // Special case: /masters/employees should show as Home > Employees (it's now in HR module)
+  if (location.pathname === '/masters/employees') {
+    return (
+      <Breadcrumb className="mb-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/dashboard" className="flex items-center gap-1">
+                <Home className="w-3 h-3" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="w-3 h-3" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage className="font-semibold">
+              Employees
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    );
+  }
+
   const breadcrumbItems = [
     { label: 'Home', path: '/dashboard' }
   ];

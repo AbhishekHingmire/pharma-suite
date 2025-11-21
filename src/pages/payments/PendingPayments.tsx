@@ -81,8 +81,8 @@ export default function PendingPayments() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold">Payment Management</h2>
-            <p className="text-md text-muted-foreground">
+            <h2 className="text-lg font-bold">Payments</h2>
+            <p className="text-sm text-muted-foreground">
               Track pending and completed payments
             </p>
           </div>

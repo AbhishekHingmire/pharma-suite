@@ -18,16 +18,19 @@ import ReceivePayment from "./pages/payments/ReceivePayment";
 import PendingPayments from "./pages/payments/PendingPayments";
 import MastersIndex from "./pages/masters/MastersIndex";
 import RateMaster from "./pages/masters/RateMaster";
-import Users from "./pages/masters/Users";
+import Employees from "./pages/masters/Employees";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Reports from "./pages/Reports";
 import Workers from "./pages/Workers";
+import Settings from "./pages/Settings";
 import PaymentHistory from "./pages/payments/PaymentHistory";
 import Companies from "./pages/masters/Companies";
 import Products from "./pages/masters/Products";
 import Customers from "./pages/masters/Customers";
 import Schemes from "./pages/masters/Schemes";
+import Attendance from "./pages/hr/Attendance";
+import EmployeeTimeline from "./pages/hr/EmployeeTimeline";
 
 const queryClient = new QueryClient();
 
@@ -127,9 +130,19 @@ function AppRoutes() {
           <RateMaster />
         </ProtectedRoute>
       } />
-      <Route path="/masters/users" element={
+      <Route path="/masters/employees" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <Users />
+          <Employees />
+        </ProtectedRoute>
+      } />
+      <Route path="/employees/:employeeId/timeline" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <EmployeeTimeline />
+        </ProtectedRoute>
+      } />
+      <Route path="/attendance" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Attendance />
         </ProtectedRoute>
       } />
       <Route path="/masters/companies" element={
@@ -166,7 +179,7 @@ function AppRoutes() {
 
       <Route path="/settings" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <Profile />
+          <Settings />
         </ProtectedRoute>
       } />
       

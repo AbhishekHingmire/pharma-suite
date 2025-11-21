@@ -1,11 +1,90 @@
+// ===== MODULE SYSTEM =====
+export interface SystemSettings {
+  modules: {
+    inventory: {
+      enabled: boolean;
+      features: {
+        sales: boolean;
+        purchase: boolean;
+        payments: boolean;
+        reports: boolean;
+      };
+    };
+    hr: {
+      enabled: boolean;
+      features: {
+        attendance: boolean;
+        leave: boolean;
+        activities: boolean;
+        performance: boolean;
+      };
+    };
+  };
+  subscription: {
+    plan: 'free' | 'professional' | 'enterprise';
+    hrModuleActive: boolean;
+    expiryDate?: string;
+  };
+}
+
+// ===== USER & EMPLOYEE MANAGEMENT =====
 export type UserRole = 'admin' | 'staff';
+
+export type EmployeeRole = 
+  | 'admin'                    // Owner/Director
+  | 'sales-rep'                // Medical Representative
+  | 'sales-manager'            // Area Sales Manager
+  | 'sales-coordinator'        // Sales Coordinator
+  | 'warehouse-manager'        // Warehouse Manager
+  | 'warehouse-worker'         // Picker/Packer
+  | 'delivery-executive'       // Driver/Delivery
+  | 'dispatch-coordinator'     // Dispatch Coordinator
+  | 'purchase-manager'         // Purchase Manager
+  | 'accounts-executive'       // Accounts
+  | 'data-entry'               // Data Entry Operator
+  | 'qc-officer';              // Quality Control
+
+export type Department = 'sales' | 'warehouse' | 'operations' | 'accounts' | 'quality';
+
+export type EmployeeStatus = 'active' | 'inactive' | 'on-leave';
+
+export interface Permission {
+  module: string;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+export interface EmployeeTargets {
+  type: 'sales' | 'visits' | 'deliveries';
+  monthly: number;
+  achieved: number;
+}
 
 export interface User {
   id: number;
   name: string;
   mobile: string;
+  email?: string;
   role: UserRole;
   token: string;
+  
+  // HR Module Fields (optional, shown if HR module enabled)
+  employeeRole?: EmployeeRole;
+  employeeCode?: string;
+  department?: Department;
+  status?: EmployeeStatus;
+  joiningDate?: string;
+  reportingTo?: number;
+  address?: string;
+  emergencyContact?: string;
+  workingHours?: {
+    start: string;
+    end: string;
+  };
+  weeklyOff?: number[];
+  targets?: EmployeeTargets;
+  permissions?: Permission[];
 }
 
 export interface Company {
@@ -76,6 +155,7 @@ export interface Purchase {
   inventoryPhotos: string[];
   createdAt?: string;
   lastEditedAt?: string;
+  createdBy?: number; // Employee ID who created this purchase
 }
 
 export interface SalesItem {
@@ -99,6 +179,7 @@ export interface Sale {
   total: number;
   status: 'paid' | 'unpaid' | 'partial';
   paidAmount?: number;
+  createdBy?: number; // Employee ID who created this sale
 }
 
 export interface InventoryBatch {
@@ -169,4 +250,135 @@ export interface Payment {
   reference?: string;
   invoices: number[];
   notes?: string;
+}
+
+// ===== HR MODULE TYPES =====
+
+export type AttendanceStatus = 'present' | 'absent' | 'half-day' | 'leave' | 'holiday' | 'week-off';
+export type LeaveType = 'sick' | 'casual' | 'earned' | 'unpaid';
+export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected';
+export type ActivityType = 'sale' | 'purchase' | 'delivery' | 'visit' | 'task' | 'meeting' | 'call' | 'payment';
+export type ActivityStatus = 'completed' | 'pending' | 'in-progress';
+export type ActivityPriority = 'low' | 'medium' | 'high';
+
+export interface Location {
+  lat: number;
+  lng: number;
+  address: string;
+}
+
+export interface Attendance {
+  id: number;
+  employeeId: number;
+  date: string;
+  checkIn?: string;
+  checkOut?: string;
+  status: AttendanceStatus;
+  leaveType?: LeaveType;
+  leaveReason?: string;
+  workHours?: number;
+  overtime?: number;
+  checkInLocation?: Location;
+  checkOutLocation?: Location;
+  markedBy: 'self' | 'admin' | 'system';
+  approvedBy?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface LeaveRequest {
+  id: number;
+  employeeId: number;
+  leaveType: LeaveType;
+  fromDate: string;
+  toDate: string;
+  days: number;
+  reason: string;
+  status: LeaveRequestStatus;
+  appliedOn: string;
+  approvedBy?: number;
+  approvalDate?: string;
+  rejectionReason?: string;
+}
+
+export interface LeaveBalance {
+  employeeId: number;
+  year: number;
+  casual: { total: number; used: number; remaining: number };
+  sick: { total: number; used: number; remaining: number };
+  earned: { total: number; used: number; remaining: number };
+}
+
+export interface VisitDetails {
+  customerName: string;
+  customerType: 'doctor' | 'pharmacy' | 'hospital';
+  location: Location;
+  orderValue?: number;
+  feedback?: string;
+  nextFollowUp?: string;
+}
+
+export interface DeliveryDetails {
+  orderId: number;
+  customerName: string;
+  deliveryStatus: 'delivered' | 'partial' | 'returned' | 'rescheduled';
+  paymentCollected?: number;
+  signature?: string;
+}
+
+export interface EmployeeActivity {
+  id: number;
+  employeeId: number;
+  employeeName?: string; // For display
+  date: string;
+  timestamp: string;
+  type: ActivityType;
+  title: string;
+  description?: string;
+  saleId?: number;
+  purchaseId?: number;
+  customerId?: number;
+  visitDetails?: VisitDetails;
+  deliveryDetails?: DeliveryDetails;
+  status: ActivityStatus;
+  priority?: ActivityPriority;
+  location?: Location;
+  startTime?: string;
+  endTime?: string;
+  duration?: number;
+  attachments?: string[];
+  createdAt: string;
+}
+
+export interface SalesMetrics {
+  visitsCompleted: number;
+  ordersGenerated: number;
+  orderValue: number;
+  newCustomers: number;
+}
+
+export interface DeliveryMetrics {
+  deliveriesCompleted: number;
+  cashCollected: number;
+  returns: number;
+}
+
+export interface WarehouseMetrics {
+  ordersProcessed: number;
+  stockAdjustments: number;
+  itemsPicked: number;
+}
+
+export interface DailyReport {
+  id: number;
+  employeeId: number;
+  date: string;
+  totalActivities: number;
+  completedTasks: number;
+  pendingTasks: number;
+  salesMetrics?: SalesMetrics;
+  deliveryMetrics?: DeliveryMetrics;
+  warehouseMetrics?: WarehouseMetrics;
+  remarks?: string;
+  submittedAt: string;
 }

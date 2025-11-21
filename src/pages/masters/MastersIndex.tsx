@@ -48,14 +48,6 @@ export default function MastersIndex() {
       path: '/masters/rate-master',
       color: 'bg-teal-500',
       roles: ['admin']
-    },
-    {
-      icon: UserCog,
-      title: 'Users',
-      description: 'Team management',
-      path: '/masters/users',
-      color: 'bg-indigo-500',
-      roles: ['admin']
     }
   ];
 
