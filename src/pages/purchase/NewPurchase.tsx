@@ -63,6 +63,61 @@ export default function NewPurchase() {
     // Calculate amount
     if (field === 'qty' || field === 'rate') {
       newItems[index].amount = newItems[index].qty * newItems[index].rate;
+      
+      // Recalculate discount if scheme is applied
+      const schemeId = selectedSchemes[index];
+      if (schemeId) {
+        const scheme = schemes.find(s => s.id === schemeId);
+        if (scheme) {
+          const item = newItems[index];
+          
+          if (scheme.type === 'freeQty') {
+            if (item.qty >= (scheme.buyQty || 0)) {
+              const multiplier = Math.floor(item.qty / (scheme.buyQty || 1));
+              item.freeQty = multiplier * (scheme.freeQty || 0);
+            } else {
+              item.freeQty = 0;
+            }
+            item.finalAmount = item.amount;
+            
+          } else if (scheme.type === 'discount') {
+            const minQty = scheme.minPurchaseQty || 0;
+            if (item.qty >= minQty) {
+              item.discountPercent = scheme.discountPercent || 0;
+              item.discountAmount = (item.amount * item.discountPercent) / 100;
+              item.finalAmount = item.amount - item.discountAmount;
+            } else {
+              item.discountPercent = 0;
+              item.discountAmount = 0;
+              item.finalAmount = item.amount;
+            }
+            
+          } else if (scheme.type === 'slab') {
+            const applicableSlab = scheme.slabs?.find(s => item.qty >= s.minQty && item.qty <= s.maxQty);
+            if (applicableSlab) {
+              item.discountPercent = applicableSlab.discount;
+              item.discountAmount = (item.amount * item.discountPercent) / 100;
+              item.finalAmount = item.amount - item.discountAmount;
+            } else {
+              item.discountPercent = 0;
+              item.discountAmount = 0;
+              item.finalAmount = item.amount;
+            }
+            
+          } else if (scheme.type === 'trade') {
+            item.discountPercent = scheme.tradeDiscountPercent || 0;
+            item.discountAmount = (item.amount * item.discountPercent) / 100;
+            item.finalAmount = item.amount - item.discountAmount;
+            
+          } else if (scheme.type === 'seasonal') {
+            item.discountPercent = scheme.seasonalDiscountPercent || 0;
+            item.discountAmount = (item.amount * item.discountPercent) / 100;
+            item.finalAmount = item.amount - item.discountAmount;
+          }
+        }
+      } else {
+        newItems[index].finalAmount = newItems[index].amount;
+      }
     }
 
     setItems(newItems);
@@ -97,7 +152,11 @@ export default function NewPurchase() {
     const item = newItems[index];
 
     if (!schemeId) {
+      // Reset discount and free quantity
       item.freeQty = 0;
+      item.discountPercent = 0;
+      item.discountAmount = 0;
+      item.finalAmount = item.amount;
       setItems(newItems);
       return;
     }
@@ -105,15 +164,67 @@ export default function NewPurchase() {
     const scheme = schemes.find(s => s.id === schemeId);
     if (!scheme) return;
 
-    // Calculate free quantity based on scheme
-    if (scheme.type === 'freeQty' && item.qty >= (scheme.buyQty || 0)) {
-      const multiplier = Math.floor(item.qty / (scheme.buyQty || 1));
-      item.freeQty = multiplier * (scheme.freeQty || 0);
-    } else if (scheme.type === 'discount' && item.qty >= (scheme.buyQty || 0)) {
-      item.freeQty = 0; // Discount schemes don't give free quantity
-    } else {
-      // Quantity doesn't meet minimum requirement
+    // Calculate based on scheme type
+    if (scheme.type === 'freeQty') {
+      // Buy X Get Y Free
+      if (item.qty >= (scheme.buyQty || 0)) {
+        const multiplier = Math.floor(item.qty / (scheme.buyQty || 1));
+        item.freeQty = multiplier * (scheme.freeQty || 0);
+      } else {
+        item.freeQty = 0;
+      }
+      item.discountPercent = 0;
+      item.discountAmount = 0;
+      item.finalAmount = item.amount;
+      
+    } else if (scheme.type === 'discount') {
+      // Flat Discount
       item.freeQty = 0;
+      const minQty = scheme.minPurchaseQty || 0;
+      if (item.qty >= minQty) {
+        item.discountPercent = scheme.discountPercent || 0;
+        item.discountAmount = (item.amount * item.discountPercent) / 100;
+        item.finalAmount = item.amount - item.discountAmount;
+      } else {
+        item.discountPercent = 0;
+        item.discountAmount = 0;
+        item.finalAmount = item.amount;
+      }
+      
+    } else if (scheme.type === 'slab') {
+      // Slab Discount (Quantity-based)
+      item.freeQty = 0;
+      const applicableSlab = scheme.slabs?.find(s => item.qty >= s.minQty && item.qty <= s.maxQty);
+      if (applicableSlab) {
+        item.discountPercent = applicableSlab.discount;
+        item.discountAmount = (item.amount * item.discountPercent) / 100;
+        item.finalAmount = item.amount - item.discountAmount;
+      } else {
+        item.discountPercent = 0;
+        item.discountAmount = 0;
+        item.finalAmount = item.amount;
+      }
+      
+    } else if (scheme.type === 'trade') {
+      // Trade Discount
+      item.freeQty = 0;
+      item.discountPercent = scheme.tradeDiscountPercent || 0;
+      item.discountAmount = (item.amount * item.discountPercent) / 100;
+      item.finalAmount = item.amount - item.discountAmount;
+      
+    } else if (scheme.type === 'seasonal') {
+      // Seasonal Discount
+      item.freeQty = 0;
+      item.discountPercent = scheme.seasonalDiscountPercent || 0;
+      item.discountAmount = (item.amount * item.discountPercent) / 100;
+      item.finalAmount = item.amount - item.discountAmount;
+      
+    } else {
+      // Other schemes (cash, volume, combo) - will be handled at invoice level
+      item.freeQty = 0;
+      item.discountPercent = 0;
+      item.discountAmount = 0;
+      item.finalAmount = item.amount;
     }
 
     setItems(newItems);
@@ -121,12 +232,27 @@ export default function NewPurchase() {
 
   const isSchemeApplicable = (index: number, scheme: Scheme) => {
     const item = items[index];
-    const minQty = scheme.buyQty || 0;
-    return item.qty >= minQty;
+    
+    // Check based on scheme type
+    if (scheme.type === 'freeQty') {
+      return item.qty >= (scheme.buyQty || 0);
+    } else if (scheme.type === 'discount') {
+      return item.qty >= (scheme.minPurchaseQty || 0);
+    } else if (scheme.type === 'slab') {
+      return scheme.slabs?.some(s => item.qty >= s.minQty && item.qty <= s.maxQty) || false;
+    } else if (scheme.type === 'cash' || scheme.type === 'volume') {
+      // These are invoice-level schemes, not item-level
+      return false;
+    } else if (scheme.type === 'combo') {
+      // Check if this product is part of combo
+      return scheme.comboProducts?.includes(item.productId) || false;
+    }
+    
+    return true; // trade, seasonal
   };
 
   const calculateTotals = () => {
-    const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
+    const subtotal = items.reduce((sum, item) => sum + (item.finalAmount || item.amount), 0);
     const gst = subtotal * 0.12;
     const total = subtotal + gst;
     return { subtotal, gst, total };
@@ -362,15 +488,34 @@ export default function NewPurchase() {
                           const isExpired = status === 'expired';
                           const isUpcoming = status === 'upcoming';
                           const isApplicable = isSchemeApplicable(index, scheme);
-                          const minQty = scheme.buyQty || 0;
                           
                           let label = '';
+                          let minInfo = '';
+                          
                           if (scheme.type === 'freeQty') {
                             label = `Buy ${scheme.buyQty}, Get ${scheme.freeQty} Free`;
+                            minInfo = `Min qty: ${scheme.buyQty}`;
                           } else if (scheme.type === 'discount') {
-                            label = `${scheme.discountPercent}% Discount (Min: ${minQty})`;
+                            label = `${scheme.discountPercent}% Flat Discount`;
+                            minInfo = scheme.minPurchaseQty ? `Min qty: ${scheme.minPurchaseQty}` : '';
+                          } else if (scheme.type === 'slab') {
+                            label = `Slab Discount (${scheme.slabs?.length || 0} tiers)`;
+                            minInfo = '';
+                          } else if (scheme.type === 'cash') {
+                            label = `${scheme.cashDiscountPercent}% Cash Discount (${scheme.paymentDays}d)`;
+                            minInfo = '';
+                          } else if (scheme.type === 'trade') {
+                            label = `${scheme.tradeDiscountPercent}% Trade Discount`;
+                            minInfo = '';
+                          } else if (scheme.type === 'seasonal') {
+                            label = `${scheme.seasonalDiscountPercent}% ${scheme.promoName || 'Seasonal'}`;
+                            minInfo = '';
+                          } else if (scheme.type === 'combo') {
+                            label = `${scheme.comboDiscountPercent}% Combo Discount`;
+                            minInfo = '';
                           } else {
-                            label = 'Slab Discount';
+                            label = 'Volume Discount';
+                            minInfo = '';
                           }
 
                           return (
@@ -379,7 +524,7 @@ export default function NewPurchase() {
                               value={scheme.id.toString()}
                               disabled={isExpired || isUpcoming || !isApplicable}
                             >
-                              {label} {isExpired && '(Expired)'} {isUpcoming && '(Upcoming)'} {!isApplicable && `(Min qty: ${minQty})`}
+                              {label} {isExpired && '(Expired)'} {isUpcoming && '(Upcoming)'} {!isApplicable && minInfo && `(${minInfo})`}
                             </SelectItem>
                           );
                         })}
@@ -421,11 +566,25 @@ export default function NewPurchase() {
 
                   <div className="space-y-2 md:col-span-2">
                     <Label>Amount</Label>
-                    <Input
-                      value={`₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                      className="bg-muted font-semibold"
-                      readOnly
-                    />
+                    <div className="space-y-1">
+                      <Input
+                        value={`₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                        readOnly
+                        className="font-medium"
+                      />
+                      {item.discountPercent && item.discountPercent > 0 && (
+                        <div className="text-xs space-y-0.5">
+                          <div className="flex items-center gap-2 text-success">
+                            <span>Discount: {item.discountPercent.toFixed(2)}%</span>
+                            <span className="text-danger">-₹{item.discountAmount?.toFixed(2)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 font-semibold text-foreground">
+                            <span>Final Amount:</span>
+                            <span>₹{item.finalAmount?.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 

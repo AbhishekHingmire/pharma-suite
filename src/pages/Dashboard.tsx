@@ -131,64 +131,71 @@ export default function Dashboard() {
 
         {/* Alerts */}
         {(expiringProducts.length > 0 || lowStockProducts.length > 0) && (
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Alerts</h3>
-            <div className="space-y-3">
-              {expiringProducts.length > 0 && (
-                <Card className="p-3 md:p-4 border-l-4 border-l-danger">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
-                      <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-danger flex-shrink-0 mt-0.5" />
+          <Card>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold">Alerts</h3>
+                <span className="text-xs font-medium px-2 py-1 bg-muted rounded-full">
+                  {(expiringProducts.length > 0 ? 1 : 0) + (lowStockProducts.length > 0 ? 1 : 0)} {((expiringProducts.length > 0 ? 1 : 0) + (lowStockProducts.length > 0 ? 1 : 0)) === 1 ? 'Alert' : 'Alerts'}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {expiringProducts.length > 0 && (
+                  <div className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-danger/5 border-l-4 border-danger hover:bg-danger/10 transition-colors">
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <div className="p-1.5 bg-danger/10 rounded-lg shrink-0">
+                        <AlertCircle className="w-4 h-4 text-danger" />
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-danger text-sm md:text-base">Products Expiring Soon</p>
-                        <p className="text-xs md:text-sm text-muted-foreground truncate" title={formatAmount(expiringValue)}>
-                          {expiringProducts.length} products expiring in 90 days - {formatCompactAmount(expiringValue)} value
+                        <p className="font-semibold text-danger text-sm">Products Expiring Soon</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {expiringProducts.length} product{expiringProducts.length > 1 ? 's' : ''} expiring in 90 days · {formatCompactAmount(expiringValue)} value
                         </p>
                       </div>
                     </div>
                     <Button 
-                      variant="link" 
+                      variant="ghost" 
                       size="sm" 
-                      className="flex-shrink-0 text-xs md:text-sm h-auto py-1 px-2" 
+                      className="text-danger hover:text-danger hover:bg-danger/10 h-8 text-xs shrink-0"
                       onClick={() => navigate('/inventory/stock')}
                     >
                       View
                     </Button>
                   </div>
-                </Card>
-              )}
+                )}
 
-              {lowStockProducts.length > 0 && (
-                <Card className="p-3 md:p-4 border-l-4 border-l-warning">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
-                      <Package className="w-4 h-4 md:w-5 md:h-5 text-warning flex-shrink-0 mt-0.5" />
+                {lowStockProducts.length > 0 && (
+                  <div className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-warning/5 border-l-4 border-warning hover:bg-warning/10 transition-colors">
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <div className="p-1.5 bg-warning/10 rounded-lg shrink-0">
+                        <Package className="w-4 h-4 text-warning" />
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-warning text-sm md:text-base">Low Stock Alert</p>
-                        <p className="text-xs md:text-sm text-muted-foreground">
-                          {lowStockProducts.length} products below minimum stock level
+                        <p className="font-semibold text-warning text-sm">Low Stock Alert</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {lowStockProducts.length} product{lowStockProducts.length > 1 ? 's' : ''} below minimum stock level
                         </p>
                       </div>
                     </div>
                     <Button 
-                      variant="link" 
+                      variant="ghost" 
                       size="sm" 
-                      className="flex-shrink-0 text-xs md:text-sm h-auto py-1 px-2" 
+                      className="text-warning hover:text-warning hover:bg-warning/10 h-8 text-xs shrink-0"
                       onClick={() => navigate('/inventory/stock')}
                     >
                       View
                     </Button>
                   </div>
-                </Card>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Quick Actions */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Actions</h3>
-          <div className="grid grid-cols-3 gap-2 md:gap-3">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3">
             {user?.role === 'admin' && (
               <Button className="w-full h-auto py-2.5 px-2 md:px-4 md:py-3 justify-center md:justify-start text-xs md:text-sm" size="lg" onClick={() => navigate('/purchase/new')}>
                 <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />

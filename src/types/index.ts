@@ -55,6 +55,9 @@ export interface PurchaseItem {
   expiry: string;
   rate: number; // Cost per unit
   amount: number;
+  discountPercent?: number; // Discount percentage applied
+  discountAmount?: number; // Discount amount in rupees
+  finalAmount?: number; // Amount after discount
 }
 
 export interface Purchase {
@@ -112,12 +115,37 @@ export interface InventoryBatch {
 export interface Scheme {
   id: number;
   companyId: number;
-  type: 'freeQty' | 'discount' | 'slab';
+  type: 'freeQty' | 'discount' | 'slab' | 'cash' | 'volume' | 'trade' | 'seasonal' | 'combo';
+  
+  // For freeQty type (Buy X Get Y Free)
   buyQty?: number;
   freeQty?: number;
+  
+  // For discount type (Flat percentage discount)
   discountPercent?: number;
-  discountAmount?: number;
+  minPurchaseQty?: number; // Minimum quantity to qualify for discount
+  
+  // For slab type (Tiered discounts based on quantity ranges)
   slabs?: { minQty: number; maxQty: number; discount: number }[];
+  
+  // For cash type (Discount for early payment)
+  cashDiscountPercent?: number;
+  paymentDays?: number; // Days within which payment must be made
+  
+  // For volume type (Discount based on invoice total amount)
+  volumeSlabs?: { minAmount: number; maxAmount: number; discount: number }[];
+  
+  // For trade type (Fixed discount for retailers)
+  tradeDiscountPercent?: number;
+  
+  // For seasonal type (Time-based promotional offers)
+  seasonalDiscountPercent?: number;
+  promoName?: string;
+  
+  // For combo type (Buy multiple products together)
+  comboProducts?: number[]; // Array of product IDs
+  comboDiscountPercent?: number;
+  
   validFrom: string;
   validTo: string;
   products: number[] | 'all';
