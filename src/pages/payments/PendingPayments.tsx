@@ -1,8 +1,8 @@
+import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DollarSign, Calendar, Share2, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getFromStorage } from '@/lib/storage';
@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 
 export default function PendingPayments() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending');
   
   const sales = getFromStorage<Sale>('sales').filter(s => s.status !== 'paid');
   const customers = getFromStorage<Customer>('customers');
@@ -92,13 +93,25 @@ export default function PendingPayments() {
           </Button>
         </div>
 
-        <Tabs defaultValue="pending" className="w-full">
-          <TabsList>
-            <TabsTrigger value="pending">Pending ({sales.length})</TabsTrigger>
-            <TabsTrigger value="history">Payment History ({payments.length})</TabsTrigger>
-          </TabsList>
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant={activeTab === 'pending' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('pending')}
+          >
+            Pending ({sales.length})
+          </Button>
+          <Button
+            variant={activeTab === 'history' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('history')}
+          >
+            Payment History ({payments.length})
+          </Button>
+        </div>
 
-          <TabsContent value="pending" className="space-y-3 mt-4">
+        {activeTab === 'pending' && (
+          <div className="space-y-3">
             <div className="hidden lg:block">
               <Card>
                 <div className="overflow-x-auto">
@@ -139,7 +152,7 @@ export default function PendingPayments() {
                               </span>
                             </td>
                             <td className="p-3 text-center">
-                              <Badge variant={sale.status === 'unpaid' ? 'destructive' : 'secondary'}>
+                              <Badge className={sale.status === 'unpaid' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'}>
                                 {sale.status}
                               </Badge>
                             </td>
@@ -187,7 +200,7 @@ export default function PendingPayments() {
                           {getCustomerName(sale.customerId)}
                         </p>
                       </div>
-                      <Badge variant={sale.status === 'unpaid' ? 'destructive' : 'secondary'}>
+                      <Badge className={sale.status === 'unpaid' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'}>
                         {sale.status}
                       </Badge>
                     </div>
@@ -250,9 +263,11 @@ export default function PendingPayments() {
                 <p className="text-sm text-muted-foreground">No pending payments at the moment.</p>
               </Card>
             )}
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="history" className="space-y-3 mt-4">
+        {activeTab === 'history' && (
+          <div className="space-y-3">
             <div className="hidden lg:block">
               <Card>
                 <div className="overflow-x-auto">
@@ -375,8 +390,8 @@ export default function PendingPayments() {
                 <p className="text-muted-foreground">No payment history yet</p>
               </Card>
             )}
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

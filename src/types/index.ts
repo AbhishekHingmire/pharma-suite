@@ -55,6 +55,25 @@ export interface Permission {
   canDelete: boolean;
 }
 
+export interface RolePermission {
+  module: string;
+  canView: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+  description: string;
+  permissions: RolePermission[];
+  isSystem: boolean; // true for default roles (Admin, Staff), false for custom roles
+  createdAt: string;
+  updatedAt?: string;
+  createdBy: number; // admin user id
+}
+
 export interface EmployeeTargets {
   type: 'sales' | 'visits' | 'deliveries';
   monthly: number;
@@ -85,6 +104,7 @@ export interface User {
   weeklyOff?: number[];
   targets?: EmployeeTargets;
   permissions?: Permission[];
+  customRoleId?: number; // Link to custom Role
 }
 
 export interface Company {

@@ -9,7 +9,6 @@ import {
   ArrowLeft, Clock, MapPin, ShoppingCart, Package, DollarSign,
   Phone, Users, CheckCircle2, Calendar, TrendingUp
 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getFromStorage } from '@/lib/storage';
 import type { User, EmployeeActivity, Attendance, Sale, Purchase } from '@/types';
 
@@ -153,13 +152,29 @@ export default function EmployeeTimelinePage() {
             </div>
           </div>
 
-          <Tabs value={viewMode} onValueChange={(val) => setViewMode(val as any)} className="w-full sm:w-fit">
-            <TabsList className="h-8 w-full sm:w-auto">
-              <TabsTrigger value="today" className="text-xs">Today</TabsTrigger>
-              <TabsTrigger value="week" className="text-xs">This Week</TabsTrigger>
-              <TabsTrigger value="month" className="text-xs">This Month</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === 'today' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('today')}
+            >
+              Today
+            </Button>
+            <Button
+              variant={viewMode === 'week' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('week')}
+            >
+              This Week
+            </Button>
+            <Button
+              variant={viewMode === 'month' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('month')}
+            >
+              This Month
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}

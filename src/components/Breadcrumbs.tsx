@@ -43,6 +43,32 @@ export function Breadcrumbs() {
     );
   }
 
+  // Special case: /hr/roles should show as Home > Roles & Permissions
+  if (location.pathname === '/hr/roles') {
+    return (
+      <Breadcrumb className="mb-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/dashboard" className="flex items-center gap-1">
+                <Home className="w-3 h-3" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="w-3 h-3" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage className="font-semibold">
+              Roles & Permissions
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    );
+  }
+
   const breadcrumbItems = [
     { label: 'Home', path: '/dashboard' }
   ];

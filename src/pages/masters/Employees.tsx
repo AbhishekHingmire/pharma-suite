@@ -355,10 +355,10 @@ export default function EmployeesPage() {
 
               <div className="space-y-1 mb-2 pt-2 border-t">
                 <div className="flex items-center gap-1 flex-wrap">
-                  <Badge className={`text-[10px] px-1.5 py-0 ${getRoleBadgeColor(employee.employeeRole || 'sales-rep')}`}>
+                  <Badge className={`text-[10px] ${getRoleBadgeColor(employee.employeeRole || 'sales-rep')}`}>
                     {EMPLOYEE_ROLES.find(r => r.value === employee.employeeRole)?.label || 'Staff'}
                   </Badge>
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                  <Badge variant="outline" className="text-[10px]">
                     {DEPARTMENTS.find(d => d.value === employee.department)?.label || 'Operations'}
                   </Badge>
                 </div>

@@ -279,7 +279,7 @@ export default function Workers() {
                             <div className="text-xs text-muted-foreground">{worker.mobile}</div>
                           </div>
                         </div>
-                        <Badge>Active</Badge>
+                        <Badge className="bg-green-500">Active</Badge>
                       </div>
 
                       <div className="flex justify-between items-center pt-2 border-t text-xs text-muted-foreground">

@@ -22,7 +22,6 @@ import {
   Calendar as CalendarIcon, Check, X, Clock, TrendingUp,
   Users, CheckCircle2, XCircle, Coffee, Home, Plus
 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getFromStorage, saveToStorage, getNextId } from '@/lib/storage';
 import type { User, Attendance, AttendanceStatus } from '@/types';
 import { toast } from 'sonner';
@@ -32,6 +31,7 @@ export default function AttendancePage() {
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [activeView, setActiveView] = useState<'list' | 'calendar'>('list');
   const [isMarkDialogOpen, setIsMarkDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [markStatus, setMarkStatus] = useState<AttendanceStatus>('present');
@@ -223,13 +223,25 @@ export default function AttendancePage() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="list" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 h-9 max-w-full sm:max-w-md">
-            <TabsTrigger value="list" className="text-xs">Attendance List</TabsTrigger>
-            <TabsTrigger value="calendar" className="text-xs">Calendar View</TabsTrigger>
-          </TabsList>
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant={activeView === 'list' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveView('list')}
+          >
+            Attendance List
+          </Button>
+          <Button
+            variant={activeView === 'calendar' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveView('calendar')}
+          >
+            Calendar View
+          </Button>
+        </div>
 
-          <TabsContent value="list" className="space-y-3 mt-4">
+        {activeView === 'list' && (
+          <div className="space-y-3">
             <Card className="p-4">
               <div className="space-y-2">
                 {employees.map(employee => {
@@ -296,9 +308,11 @@ export default function AttendancePage() {
                 })}
               </div>
             </Card>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="calendar" className="space-y-3 mt-4">
+        {activeView === 'calendar' && (
+          <div className="space-y-3">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               <Card className="col-span-1 lg:col-span-2 p-3">
                 <Calendar
@@ -355,8 +369,8 @@ export default function AttendancePage() {
                 </div>
               </Card>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
 
       {/* Mark Attendance Dialog */}
@@ -383,16 +397,25 @@ export default function AttendancePage() {
               <div className="space-y-2">
                 <p className="text-xs font-medium">Status</p>
                 <div className="grid grid-cols-3 gap-2">
-                  {(['present', 'absent', 'half-day', 'leave'] as AttendanceStatus[]).map(status => (
-                    <Button
-                      key={status}
-                      variant={markStatus === status ? 'default' : 'outline'}
-                      onClick={() => setMarkStatus(status)}
-                      className="h-9 text-xs capitalize"
-                    >
-                      {status.replace('-', ' ')}
-                    </Button>
-                  ))}
+                  {(['present', 'absent', 'half-day', 'leave'] as AttendanceStatus[]).map(status => {
+                    let colorClass = '';
+                    if (markStatus === status) {
+                      if (status === 'present') colorClass = 'bg-green-500 hover:bg-green-600';
+                      else if (status === 'absent') colorClass = 'bg-red-500 hover:bg-red-600';
+                      else if (status === 'half-day') colorClass = 'bg-yellow-500 hover:bg-yellow-600';
+                      else if (status === 'leave') colorClass = 'bg-blue-500 hover:bg-blue-600';
+                    }
+                    return (
+                      <Button
+                        key={status}
+                        variant={markStatus === status ? 'default' : 'outline'}
+                        onClick={() => setMarkStatus(status)}
+                        className={`h-9 text-xs capitalize ${colorClass}`}
+                      >
+                        {status.replace('-', ' ')}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
 

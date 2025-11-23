@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Receipt, Package, CreditCard, FileText, FolderTree, Settings, LogOut, Users, Calendar } from 'lucide-react';
+import { Home, ShoppingCart, Receipt, Package, CreditCard, FileText, FolderTree, Settings, LogOut, Users, Calendar, Shield } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuthStore } from '@/store/authStore';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     { to: '/masters', icon: FolderTree, label: 'Masters', roles: ['admin'], section: 'inventory' },
     { to: '/masters/employees', icon: Users, label: 'Employees', roles: ['admin'], section: 'hr', requiresBasicHR: true }, // Always visible
     { to: '/attendance', icon: Calendar, label: 'Attendance', roles: ['admin'], section: 'hr', requiresFullHR: true }, // Only with subscription
+    { to: '/hr/roles', icon: Shield, label: 'Roles & Permissions', roles: ['admin'], section: 'hr', requiresBasicHR: true }, // Always visible
     { to: '/settings', icon: Settings, label: 'Settings', roles: ['admin'], section: 'bottom' },
   ];
 

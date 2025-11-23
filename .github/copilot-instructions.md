@@ -550,9 +550,299 @@ npx tsc --noEmit        # Check types without building
 
 ---
 
-**Last Updated**: November 21, 2025
-**Version**: 2.0.0 (Two-Tier HR System)
+**Last Updated**: November 23, 2025
+**Version**: 2.1.0 (UI Consistency + Roles & Permissions)
 **Maintainer**: AI Agent + Developer
+
+---
+
+## Feature Roadmap & Implementation Status
+
+### ✅ **Implemented Features**
+
+#### Core Inventory Management
+- Sales management with invoice generation
+- Purchase management with supplier tracking
+- Stock tracking with real-time updates
+- Payment tracking (pending/history)
+- Customer management with credit tracking
+- Product master with HSN/GST
+- Company/supplier management
+- Rate master for pricing
+- Scheme management
+- Reports dashboard
+
+#### HR Management (Two-Tier)
+- Employee management
+- Attendance tracking (list + calendar views)
+- Activity timeline (auto-logging)
+- Roles & Permissions system
+- Employee performance tracking
+
+#### UI/UX Features
+- Button-based tab navigation (consistent across app)
+- Mobile-responsive design
+- Dark mode support
+- Toast notifications
+- Search functionality
+- Export via email
+
+---
+
+### 🎯 **Priority Feature Backlog**
+
+#### **Phase 1: Critical Features (Must-Have for Market Competitiveness)**
+
+1. **Batch & Expiry Management** 🔴 HIGH PRIORITY
+   - **Why Critical**: Pharma regulatory requirement, prevents expired stock sales
+   - **Implementation**:
+     * Add `batch`, `expiryDate`, `mfgDate` to PurchaseItem type
+     * Create batch selection in sales (dropdown with expiry info)
+     * Add expiry alerts on dashboard (7/15/30 days)
+     * Create "Expiring Soon" report page
+     * Implement batch-wise stock tracking
+   - **Estimated Effort**: 2-3 days
+   - **Files to Modify**: 
+     * `src/types/index.ts` (add batch fields)
+     * `src/pages/purchase/NewPurchase.tsx` (batch input)
+     * `src/pages/sales/NewSale.tsx` (batch selection)
+     * `src/pages/inventory/InventoryStock.tsx` (batch view)
+     * `src/pages/Dashboard.tsx` (expiry alerts)
+
+2. **GST Compliance & Reports** 🔴 HIGH PRIORITY
+   - **Why Critical**: Tax compliance mandatory in India
+   - **Implementation**:
+     * Calculate CGST/SGST/IGST in sales/purchase
+     * Generate GSTR-1 report (outward supplies)
+     * Generate GSTR-3B summary
+     * Add GST number validation
+     * Create tax summary reports
+   - **Estimated Effort**: 3-4 days
+   - **Files to Modify**:
+     * `src/types/index.ts` (add GST fields)
+     * `src/pages/sales/NewSale.tsx` (GST calculation)
+     * `src/pages/Reports.tsx` (GST reports)
+     * Create `src/pages/reports/GSTReports.tsx`
+
+3. **Credit Limit Enforcement** 🟠 MEDIUM PRIORITY
+   - **Why Important**: Prevent bad debts, financial risk management
+   - **Implementation**:
+     * Check customer outstanding vs credit limit in sales
+     * Show warning/block sale if limit exceeded
+     * Add credit utilization indicator in customer list
+     * Send alerts when approaching limit (80%, 90%, 100%)
+   - **Estimated Effort**: 1 day
+   - **Files to Modify**:
+     * `src/pages/sales/NewSale.tsx` (limit check)
+     * `src/pages/masters/Customers.tsx` (utilization display)
+
+4. **Sales Return & Credit Notes** 🟠 MEDIUM PRIORITY
+   - **Why Important**: Common business operation, stock reconciliation
+   - **Implementation**:
+     * Create return entry page (reference original sale)
+     * Update stock on return
+     * Generate credit note
+     * Link returns to original invoices
+     * Update customer outstanding
+   - **Estimated Effort**: 2 days
+   - **Files to Create**:
+     * `src/pages/sales/SalesReturn.tsx`
+     * `src/types/index.ts` (add SalesReturn type)
+
+5. **PDF Invoice Generation** 🟠 MEDIUM PRIORITY
+   - **Why Important**: Professional documentation, customer requirement
+   - **Implementation**:
+     * Use jsPDF or react-pdf library
+     * Create invoice template with company logo
+     * Include GST details, batch info, terms
+     * Add print and download options
+     * Email invoice capability
+   - **Estimated Effort**: 2 days
+   - **Dependencies**: Install `jspdf` or `@react-pdf/renderer`
+   - **Files to Create**:
+     * `src/components/InvoiceTemplate.tsx`
+     * `src/lib/pdf-generator.ts`
+
+6. **Data Backup & Restore** 🟢 GOOD TO HAVE
+   - **Why Important**: Data security, disaster recovery
+   - **Implementation**:
+     * Export all localStorage data as JSON
+     * Import backup file to restore
+     * Scheduled auto-backup (daily/weekly)
+     * Cloud sync option (Firebase/Supabase)
+   - **Estimated Effort**: 1-2 days
+   - **Files to Create**:
+     * `src/lib/backup.ts`
+     * `src/pages/Settings.tsx` (add backup section)
+
+---
+
+#### **Phase 2: Important Features (Competitive Advantage)**
+
+7. **Barcode/QR Code Scanning** 🟠 MEDIUM PRIORITY
+   - **Implementation**:
+     * Integrate `html5-qrcode` library
+     * Add barcode field to products
+     * Scan to add products in sales/purchase
+     * Generate barcodes for products
+   - **Estimated Effort**: 2 days
+   - **Dependencies**: `html5-qrcode`, `react-barcode`
+
+8. **Purchase Order Management** 🟢 GOOD TO HAVE
+   - **Implementation**:
+     * Create PO entry page
+     * Track PO status (pending/partial/received)
+     * Convert PO to purchase
+     * PO approval workflow
+   - **Estimated Effort**: 3 days
+   - **Files to Create**:
+     * `src/pages/purchase/PurchaseOrder.tsx`
+     * `src/types/index.ts` (add PurchaseOrder type)
+
+9. **Quotation & Proforma Invoice** 🟢 GOOD TO HAVE
+   - **Implementation**:
+     * Quotation entry (before sales)
+     * Convert quotation to sale
+     * Proforma invoice generation
+     * Quotation validity tracking
+   - **Estimated Effort**: 2 days
+   - **Files to Create**:
+     * `src/pages/sales/Quotation.tsx`
+
+10. **Advanced Reports & Analytics** 🟠 MEDIUM PRIORITY
+    - **Implementation**:
+      * Product-wise profit report
+      * Customer-wise sales analysis
+      * Salesperson performance
+      * ABC/XYZ analysis
+      * Trend charts (sales, purchases)
+      * Export to PDF/Excel
+    - **Estimated Effort**: 3-4 days
+    - **Dependencies**: `xlsx`, `recharts` or `chart.js`
+    - **Files to Create**:
+      * `src/pages/reports/ProductAnalysis.tsx`
+      * `src/pages/reports/CustomerAnalysis.tsx`
+      * `src/pages/reports/SalesmanPerformance.tsx`
+
+11. **Multi-location/Branch Support** 🔴 HIGH PRIORITY (for scaling)
+    - **Implementation**:
+      * Add location field to inventory
+      * Stock transfer between locations
+      * Location-wise reports
+      * Centralized vs local inventory control
+    - **Estimated Effort**: 4-5 days
+    - **Files to Modify**: Almost all inventory pages
+
+12. **WhatsApp/SMS Notifications** 🟢 GOOD TO HAVE
+    - **Implementation**:
+      * Integrate Twilio or MSG91 API
+      * Send payment reminders
+      * Invoice sharing
+      * Order confirmations
+      * Low stock alerts to suppliers
+    - **Estimated Effort**: 2-3 days
+    - **Dependencies**: External API (Twilio/MSG91)
+
+---
+
+#### **Phase 3: Nice-to-Have Features (Future Enhancement)**
+
+13. **Leave Management** (Complete HR module)
+14. **Route Planning** (Field force optimization)
+15. **E-way Bill Generation** (Interstate compliance)
+16. **API Integrations** (Tally, accounting software)
+17. **Mobile App** (React Native)
+18. **Payroll Integration**
+19. **Commission Calculations**
+20. **Stock Aging Reports**
+21. **Dead Stock Analysis**
+22. **Expense Tracking**
+23. **Bank Reconciliation**
+24. **TDS/TCS Management**
+
+---
+
+### 📋 **Implementation Guidelines**
+
+#### For Batch Management (Example Flow)
+```typescript
+// 1. Update types
+interface PurchaseItem {
+  // ...existing fields
+  batchNumber: string;
+  expiryDate: string; // YYYY-MM-DD
+  mfgDate: string;
+  mrp: number;
+}
+
+// 2. Modify Purchase Entry
+// - Add batch input fields
+// - Validate expiry > today
+// - Store batch info with each item
+
+// 3. Modify Sales Entry
+// - Show batch dropdown per product
+// - Display expiry date (highlight if <30 days)
+// - Prevent selection of expired batches
+// - Reduce stock for specific batch
+
+// 4. Add Expiry Alerts
+// - Dashboard card: "Expiring Soon" count
+// - Separate page: List of products expiring in 7/15/30 days
+// - Badge color coding (red <7, amber <15, yellow <30)
+
+// 5. Stock View Enhancement
+// - Show batch-wise stock breakdown
+// - Batch number, expiry, quantity columns
+// - Sort by expiry (nearest first)
+```
+
+#### For GST Reports (Example Flow)
+```typescript
+// 1. Calculate GST in transactions
+const calculateGST = (amount: number, gstRate: number, isInterstate: boolean) => {
+  const gstAmount = (amount * gstRate) / 100;
+  if (isInterstate) {
+    return { igst: gstAmount, cgst: 0, sgst: 0 };
+  }
+  return { igst: 0, cgst: gstAmount / 2, sgst: gstAmount / 2 };
+};
+
+// 2. Generate GSTR-1 report
+// - Group sales by GSTIN
+// - Calculate tax amounts (CGST/SGST/IGST)
+// - Export as JSON/Excel
+
+// 3. Create tax summary
+// - Total taxable value
+// - Total CGST/SGST/IGST
+// - Period-wise breakdown
+```
+
+---
+
+### 🔄 **Recent Updates**
+
+#### November 23, 2025
+1. ✅ **UI Consistency Improvements**
+   - Migrated all tab components from Tabs/TabsList to Button-based pattern
+   - Updated: PendingPayments, Attendance, Workers, EmployeeTimeline
+   - Consistent rectangular button style across app
+
+2. ✅ **Roles & Permissions System**
+   - Created comprehensive role management page (`/hr/roles`)
+   - Granular permissions (View/Create/Edit/Delete) per module
+   - 8 modules: Dashboard, Sales, Purchase, Inventory, Payments, Reports, Masters, Employees
+   - System roles: Admin, Sales Manager, Warehouse Staff
+   - Custom role creation with dynamic permissions
+
+3. ✅ **Breadcrumb Fixes**
+   - Special cases for Employees and Roles pages
+   - Shows "Home > Page Name" instead of nested paths
+
+4. ✅ **Badge Styling Consistency**
+   - Removed cramped padding from employee badges
+   - Consistent spacing across all status labels
 
 ---
 
@@ -568,11 +858,13 @@ npx tsc --noEmit        # Check types without building
 🎨 UI PATTERNS
 ├─ Mobile-first (base → sm → lg)
 ├─ Compact premium (text-xs, h-8)
+├─ Button-based tabs (not Tabs component)
 ├─ 2-col filters on mobile
 └─ Grid: 1 → 2 → 3/4 cols
 
 💾 STORAGE KEYS
 ├─ users (employees)
+├─ roles (custom roles & permissions)
 ├─ sales, purchases, products
 ├─ attendance, activities
 ├─ systemSettings
@@ -586,4 +878,11 @@ npx tsc --noEmit        # Check types without building
 ├─ base: < 640px (mobile)
 ├─ sm: 640px+ (tablet)
 └─ lg: 1024px+ (desktop)
+
+🎯 PRIORITY FEATURES TO BUILD
+1. Batch & Expiry Management (Critical)
+2. GST Reports (Critical)
+3. Credit Limit Enforcement (Important)
+4. Sales Return (Important)
+5. PDF Invoices (Important)
 ```

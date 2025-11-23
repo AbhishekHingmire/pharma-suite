@@ -31,6 +31,7 @@ import Customers from "./pages/masters/Customers";
 import Schemes from "./pages/masters/Schemes";
 import Attendance from "./pages/hr/Attendance";
 import EmployeeTimeline from "./pages/hr/EmployeeTimeline";
+import RolesPermissions from "./pages/hr/RolesPermissions";
 
 const queryClient = new QueryClient();
 
@@ -143,6 +144,11 @@ function AppRoutes() {
       <Route path="/attendance" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <Attendance />
+        </ProtectedRoute>
+      } />
+      <Route path="/hr/roles" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <RolesPermissions />
         </ProtectedRoute>
       } />
       <Route path="/masters/companies" element={
