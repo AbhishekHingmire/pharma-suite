@@ -54,16 +54,20 @@ export default function NewSale() {
     const newItems = [...items];
     const pricing = selectedCustomer ? getSuggestedPrice(batch, selectedCustomer) : null;
     
+    // Calculate selling price with fallback
+    const sellingPrice = pricing?.price || (batch.rate * 1.3);
+    
     newItems[index] = {
       ...newItems[index],
       companyId: batch.companyId,
       brandName: batch.brandName,
       batch: batch.batch,
-      rate: pricing?.price || 0,
+      rate: sellingPrice,
     };
     
+    // Recalculate amount
     if (newItems[index].qty > 0) {
-      newItems[index].amount = newItems[index].qty * newItems[index].rate;
+      newItems[index].amount = newItems[index].qty * sellingPrice;
     }
     
     setItems(newItems);
@@ -111,7 +115,7 @@ export default function NewSale() {
     if (total > availableCredit) return false;
     
     return items.every(item => 
-      item.productId && item.qty > 0 && item.batch && item.rate > 0
+      item.productId > 0 && item.qty > 0 && item.batch && item.rate > 0
     );
   };
 
@@ -431,13 +435,13 @@ export default function NewSale() {
                           type="number"
                           step="0.01"
                           value={item.rate || ''}
-                          onChange={(e) => updateItem(index, 'rate', parseFloat(e.target.value) || 0)}
-                          className="text-md"
+                          readOnly
+                          className="text-md bg-muted cursor-not-allowed"
+                          placeholder="Auto-calculated"
                         />
-                        {selectedBatch && item.rate < selectedBatch.rate && (
-                          <p className="text-xs text-red-600 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" />
-                            Selling below cost!
+                        {item.rate > 0 && (
+                          <p className="text-xs text-green-600">
+                            ✓ Auto-calculated from batch pricing
                           </p>
                         )}
                       </div>

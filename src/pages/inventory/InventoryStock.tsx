@@ -4,17 +4,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, AlertCircle, Package, Eye } from 'lucide-react';
+import { Search, AlertCircle, Package, Eye, AlertTriangle, ShoppingCart, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { getFromStorage } from '@/lib/storage';
 import { InventoryBatch, Product } from '@/types';
 import { InventoryBatchModal } from '@/components/InventoryBatchModal';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 export default function InventoryStock() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'low' | 'expiring' | 'out'>('all');
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [expandedProducts, setExpandedProducts] = useState<Set<number>>(new Set());
+  const [view, setView] = useState<'cards' | 'batches'>('cards');
+  
+  const toggleExpand = (productId: number) => {
+    const newExpanded = new Set(expandedProducts);
+    if (newExpanded.has(productId)) {
+      newExpanded.delete(productId);
+    } else {
+      newExpanded.add(productId);
+    }
+    setExpandedProducts(newExpanded);
+  };
   
   const inventory = getFromStorage<InventoryBatch>('inventory');
   const products = getFromStorage<Product>('products');
@@ -66,13 +80,37 @@ export default function InventoryStock() {
     return matchesSearch && matchesFilter;
   });
 
-  const getStatusDot = (status: string) => {
-    const colors = {
-      good: 'bg-success',
-      warning: 'bg-warning',
-      danger: 'bg-danger'
-    };
-    return <div className={`w-2 h-2 rounded-full ${colors[status as keyof typeof colors]}`} />;
+  const getStatusBadge = (item: typeof groupedInventory[0]) => {
+    if (item.totalQty === 0) {
+      return <Badge variant="destructive" className="text-xs">Out of Stock</Badge>;
+    }
+    
+    const stockPercent = (item.totalQty / item.product.minStock) * 100;
+    const today = new Date();
+    const expiryDate = item.oldestExpiry ? new Date(item.oldestExpiry) : null;
+    const daysToExpiry = expiryDate ? Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 999;
+    
+    if (daysToExpiry < 30) {
+      return <Badge variant="destructive" className="text-xs">Critical - Expiring</Badge>;
+    } else if (stockPercent < 50) {
+      return <Badge variant="destructive" className="text-xs">Critical - Low</Badge>;
+    } else if (stockPercent < 100 || daysToExpiry < 90) {
+      return <Badge variant="secondary" className="text-xs bg-warning text-warning-foreground">Low Stock</Badge>;
+    }
+    return <Badge variant="default" className="text-xs bg-success text-white">Good</Badge>;
+  };
+  
+  const getReorderSuggestion = (item: typeof groupedInventory[0]) => {
+    if (item.totalQty >= item.product.minStock) return null;
+    const shortage = item.product.minStock - item.totalQty;
+    const suggested = Math.ceil(shortage * 1.5); // 50% buffer
+    return suggested;
+  };
+  
+  const getExpiryColor = (daysToExpiry: number) => {
+    if (daysToExpiry < 30) return 'text-danger';
+    if (daysToExpiry < 90) return 'text-warning';
+    return 'text-muted-foreground';
   };
 
   return (
@@ -191,9 +229,8 @@ export default function InventoryStock() {
                               ₹{item.stockValue.toLocaleString('en-IN')}
                             </td>
                             <td className="p-3">
-                              <div className="flex items-center justify-center gap-2">
-                                {getStatusDot(item.status)}
-                                <span className="text-sm capitalize">{item.status}</span>
+                              <div className="flex items-center justify-center">
+                                {getStatusBadge(item)}
                               </div>
                             </td>
                             <td className="p-3">
@@ -242,19 +279,17 @@ export default function InventoryStock() {
                   <div className="flex items-center gap-2">
                     {item.totalQty > 0 && (
                       <>
-                        {getStatusDot(item.status)}
-                        <Badge variant={item.totalQty > item.product.minStock ? 'default' : 'destructive'}>
-                          {item.totalQty}
-                        </Badge>
+                        {getStatusBadge(item)}
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          onClick={() => {
-                            setSelectedProductId(item.product.id);
-                            setModalOpen(true);
-                          }}
+                          onClick={() => toggleExpand(item.product.id)}
                         >
-                          <Eye className="w-4 h-4" />
+                          {expandedProducts.has(item.product.id) ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
                         </Button>
                       </>
                     )}
@@ -279,6 +314,49 @@ export default function InventoryStock() {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-2">Out of Stock</p>
+                )}
+                
+                {/* Reorder Alert */}
+                {item.totalQty > 0 && getReorderSuggestion(item) && (
+                  <div className="mt-3 p-2 bg-warning/10 border border-warning/20 rounded flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-warning">Reorder Needed</p>
+                      <p className="text-xs text-muted-foreground">Suggested: {getReorderSuggestion(item)} units</p>
+                    </div>
+                    <Button size="sm" variant="outline" className="flex-shrink-0 h-7 text-xs" onClick={() => navigate('/purchase/new')}>
+                      <ShoppingCart className="w-3 h-3 mr-1" />
+                      Order
+                    </Button>
+                  </div>
+                )}
+                
+                {/* Expanded Batch View */}
+                {expandedProducts.has(item.product.id) && item.batchDetails.length > 0 && (
+                  <div className="mt-3 space-y-2 border-t pt-3">
+                    <p className="text-xs font-semibold text-muted-foreground">Batch Details ({item.batches} batches)</p>
+                    {item.batchDetails.map((batch) => {
+                      const today = new Date();
+                      const expiryDate = new Date(batch.expiry);
+                      const daysToExpiry = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                      
+                      return (
+                        <div key={batch.batch} className="p-2 bg-muted/50 rounded border text-xs">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium">{batch.brandName}</span>
+                            <Badge variant="outline" className="text-xs">{batch.qty} units</Badge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1 text-[10px] text-muted-foreground">
+                            <div>Batch: <span className="font-mono">{batch.batch}</span></div>
+                            <div className={getExpiryColor(daysToExpiry)}>
+                              Expiry: {expiryDate.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' })}
+                              {daysToExpiry < 90 && ` (${daysToExpiry}d)`}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </Card>
             ))}

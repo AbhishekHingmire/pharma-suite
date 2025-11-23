@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { getSystemSettings, saveSystemSettings } from '@/lib/storage';
 import { initializeHRDemoData } from '@/lib/hr-demo-data';
 import { useState, useEffect } from 'react';
@@ -40,21 +40,31 @@ export default function Settings() {
     // Initialize demo data when enabling HR module
     if (enabled) {
       initializeHRDemoData();
-      toast.success('HR Module activated with demo data!');
+      toast.success('HR Module activated!', {
+        description: '5 employees, 30 days attendance, and 1800+ activities loaded',
+        duration: 4000,
+      });
     } else {
-      toast.success('HR Module deactivated');
+      toast.info('HR Module deactivated', {
+        description: 'Employee data is preserved',
+      });
     }
   };
 
   const handleLoadDemoData = () => {
     initializeHRDemoData();
-    toast.success('Demo data loaded successfully!');
+    toast.success('Demo data loaded successfully!', {
+      description: '5 employees with 180 days of activity history',
+      duration: 3000,
+    });
     // Reload page to show new data
     setTimeout(() => window.location.reload(), 1000);
   };
 
   const handleSave = () => {
-    toast.success('Settings saved successfully!');
+    toast.success('Settings saved successfully!', {
+      description: 'Your preferences have been updated',
+    });
   };
 
   if (!settings) return null;
